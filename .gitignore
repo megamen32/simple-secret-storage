@@ -1,0 +1,23 @@
+# Build artifacts
+dist/
+
+# Dependencies
+node_modules/
+
+# Hermes plans workspace (not part of the product)
+.hermes/
+
+# Empty test scaffolding from the original archive (only `tests/` is
+# leftover-empty; `test/sss-run.test.mjs` is real and shipped).
+tests/
+
+# Editor / OS
+*.swp
+*.swo
+.DS_Store
+.idea/
+.vscode/
+
+# Local override / not-committed config
+.env
+.env.local

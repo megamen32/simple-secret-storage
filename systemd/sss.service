@@ -1,0 +1,33 @@
+[Unit]
+Description=SSS — Simple Secret Storage (MCP + Web)
+After=network.target
+
+[Service]
+Type=simple
+User=roomhacker
+WorkingDirectory=/home/roomhacker/agents-projects/simple-secret-storage
+
+# Bearer token for MCP / /api/. Loaded from a private file (chmod 600).
+EnvironmentFile=/home/roomhacker/.config/sss-mcp/api-key.env
+# Public URL we advertise in MCP responses.
+Environment=SSS_SERVER_URL=https://pswd.bezrabotnyi.com
+# Listen port (matches nginx upstream on 127.0.0.1).
+Environment=SSS_PORT=8743
+# Path to Node binary. Use the modern one in /usr/local — /usr/bin/node
+# is v12 (legacy), which can't parse `??`, optional chaining, etc.
+ExecStart=/usr/local/bin/node /home/roomhacker/agents-projects/simple-secret-storage/dist/server.js
+
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/roomhacker/.sss
+
+[Install]
+WantedBy=multi-user.target

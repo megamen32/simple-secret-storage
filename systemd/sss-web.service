@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Secret Storage — Web Server
+After=network.target
+
+[Service]
+Type=simple
+Environment=SSS_API_KEY=%i
+ExecStart=/usr/bin/node /usr/local/lib/simple-secret-storage/dist/web-server.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
