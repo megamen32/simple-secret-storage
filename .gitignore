@@ -20,4 +20,4 @@ tests/
 
 # Local override / not-committed config
 .env
-.env.local
+.env.local*.tgz
