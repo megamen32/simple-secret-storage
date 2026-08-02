@@ -84,6 +84,7 @@ sudo systemctl enable --now sss.service
 say "Linking sss-get into ~/.local/bin"
 mkdir -p "$LOCAL_BIN"
 ln -sf "$INSTALL_DIR/bin/sss-get.mjs" "$LOCAL_BIN/sss-get"
+ln -sf "$INSTALL_DIR/bin/sss-run.mjs" "$LOCAL_BIN/sss-run"
 
 # --- 7. Codex MCP registration (best-effort) ---
 CODEX_CONFIG="$HOME/.codex/config.toml"

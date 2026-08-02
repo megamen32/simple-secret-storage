@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "bin": {
-    "sss-install": "bin/sss-install.mjs",
-    "sss-get": "bin/sss-get.mjs",
-    "sss-run": "bin/sss-run.mjs"
+    "sss-install": "bin/sss-install.mjs"
   },
   "scripts": {
     "build": "tsc",
