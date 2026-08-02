@@ -78,7 +78,15 @@ sed -e "s|^EnvironmentFile=.*|EnvironmentFile=$API_KEY_FILE|" \
 sudo install -m 0644 "$TMP_UNIT" "$SYSTEMD_UNIT_DST"
 rm -f "$TMP_UNIT"
 sudo systemctl daemon-reload
-sudo systemctl enable --now sss.service
+sudo systemctl enable sss.service
+# Always restart so the fresh API key (if any) takes effect.
+if sudo systemctl is-active --quiet sss.service; then
+  say "Restarting sss.service to pick up new API key"
+  sudo systemctl restart sss.service
+else
+  sudo systemctl start sss.service
+fi
+sudo systemctl is-active --quiet sss.service || die "sss.service failed to start — check 'journalctl -u sss -n 30'"
 
 # --- 6. sss-get symlink ---
 say "Linking sss-get into ~/.local/bin"
