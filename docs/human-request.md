@@ -41,6 +41,26 @@ The boundary should stay narrow: Ask Secret coordinates the request; SSS stores 
 
 These integrations are proposed orchestration, not current SSS behavior.
 
+## Optional completion callback
+
+When `SSS_HUMAN_REQUEST_CALLBACK=agent-herder` is set, a successful browser
+submission sends a best-effort POST to the fixed internal endpoint
+`http://127.0.0.1:8780/internal/human-requests/sss-completion`. Any other
+callback value is rejected; an unset value disables delivery without changing
+the submission result. The request body is exactly:
+
+```json
+{
+  "event": "sss.secret_input.completed",
+  "event_version": 1,
+  "request_id": "<opaque UUID>",
+  "status": "completed",
+  "result_ref": "<opaque UUID>"
+}
+```
+
+It contains no secret name, input token, submitted value, or decrypt URL.
+
 ## Safety invariant
 
 Plaintext must never enter LLM context.

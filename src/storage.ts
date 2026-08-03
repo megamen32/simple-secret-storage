@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { encrypt, decrypt, generateKey, validateKey, encryptForRecipient } from './crypto.js';
 import { sanitizeName, SSS_DIR, BLOBS_DIR, KEY_FILE, SECRETS_FILE, ensureDirs } from './config.js';
 
@@ -13,6 +13,7 @@ export interface AgentKey {
 }
 
 const AGENTS_FILE = () => join(SSS_DIR(), 'agents.json');
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export interface SecretMeta {
   description?: string;
@@ -28,6 +29,13 @@ export interface SecretMeta {
   inputToken?: string;
   /** ISO timestamp of when the inputToken was issued. */
   inputTokenIssuedAt?: string;
+  /** Opaque owner correlation ID for the optional completion callback. */
+  requestId?: string;
+}
+
+export interface PendingFillResult {
+  name: string;
+  requestId?: string;
 }
 
 function readJson<T = Record<string, any>>(path: string): T {
@@ -149,10 +157,11 @@ export class Storage {
   /** Fill in the value for a pending secret. Clears pending + inputToken,
    *  writes the encrypted blob, computes sha256. Returns the sanitized
    *  name on success or null if the token is invalid / not pending. */
-  fillPending(token: string, plaintext: string): string | null {
+  fillPending(token: string, plaintext: string): PendingFillResult | null {
     const entry = this.resolveInputToken(token);
     if (!entry) return null;
     const clean = entry.name;
+    const requestId = entry.meta.requestId;
     const key = this.getKey();
     writeFileSync(join(BLOBS_DIR(), `${clean}.enc`), encrypt(plaintext, key), { mode: 0o600 });
     const secrets = readJson<Record<string, SecretMeta>>(SECRETS_FILE());
@@ -161,22 +170,26 @@ export class Storage {
       pending: false,
       inputToken: undefined,
       inputTokenIssuedAt: undefined,
+      requestId: undefined,
       sha256: createHash('sha256').update(plaintext).digest('hex'),
     };
     writeJson(SECRETS_FILE(), secrets);
-    return clean;
+    return { name: clean, requestId };
   }
 
   /** Create a new pending secret with a fresh input token. Returns
    *  the input token. If a secret with this name already exists (pending
    *  or not), returns its existing inputToken so a second agent call
    *  yields the same URL instead of leaking that the secret exists. */
-  requestPending(name: string): { token: string; fresh: boolean } {
+  requestPending(name: string, requestId?: string): { token: string; fresh: boolean; requestId?: string } {
+    if (requestId !== undefined && !UUID.test(requestId)) {
+      throw new Error('requestId must be an opaque UUID');
+    }
     const clean = sanitizeName(name);
     const secrets = readJson<Record<string, SecretMeta>>(SECRETS_FILE());
     const existing = secrets[clean];
     if (existing?.pending && existing.inputToken) {
-      return { token: existing.inputToken, fresh: false };
+      return { token: existing.inputToken, fresh: false, requestId: existing.requestId };
     }
     const token = randomBytes(32).toString('base64url'); // 256-bit
     secrets[clean] = {
@@ -186,9 +199,10 @@ export class Storage {
       pending: true,
       inputToken: token,
       inputTokenIssuedAt: new Date().toISOString(),
+      requestId: requestId ?? randomUUID(),
     };
     writeJson(SECRETS_FILE(), secrets);
-    return { token, fresh: true };
+    return { token, fresh: true, requestId: secrets[clean].requestId };
   }
 
   /* ---- agents (age public keys) ---- */

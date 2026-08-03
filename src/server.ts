@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { Storage, SecretMeta } from './storage.js';
 import { ensureDirs, BLOBS_DIR } from './config.js';
+import { buildCompletionEvent, getCompletionCallback, postCompletion } from './completion-callback.js';
 
 /* ================================================================
    ENV
@@ -17,6 +18,7 @@ if (!API_KEY) {
   process.exit(1);
 }
 const SERVER_URL = process.env.SSS_SERVER_URL ?? `http://127.0.0.1:${PORT}`;
+const COMPLETION_CALLBACK = getCompletionCallback();
 
 /* ================================================================
    STORAGE
@@ -77,13 +79,14 @@ function makeServer(): McpServer {
       'into its target command — NEVER read or display the file (it is opaque bytes). ' +
       'If not found, tells the agent to ask the user to create it via the web UI.',
     { name: z.string().describe('Secret name'),
-      agent_id: z.string().optional().describe('Agent ID registered via register_agent. If provided, the value is encrypted with the agent\'s age public key (true E2E); otherwise it is returned as base64 (SSS sees the plaintext).') },
-    async ({ name, agent_id }) => {
+      agent_id: z.string().optional().describe('Agent ID registered via register_agent. If provided, the value is encrypted with the agent\'s age public key (true E2E); otherwise it is returned as base64 (SSS sees the plaintext).'),
+      request_id: z.string().uuid().optional().describe('Opaque Human Request owner ID used only for completion correlation.') },
+    async ({ name, agent_id, request_id }) => {
       const meta = storage.getSecretMeta(name);
       // Pending = user hasn't entered the value yet. Surface the
       // user-input URL so the agent forwards it again.
       if (!meta || meta.pending) {
-        const { token, fresh } = storage.requestPending(name);
+        const { token, fresh, requestId } = storage.requestPending(name, request_id);
         return {
           content: [{
             type: 'text' as const,
@@ -93,6 +96,7 @@ function makeServer(): McpServer {
                 : `Secret "${name}" not found.\n`) +
               `${fresh ? 'Send the user this one-time URL' : 'Re-send the same one-time URL'} to enter the value:\n` +
               `  ${SERVER_URL}/i/${token}\n\n` +
+              `Opaque request_id: ${requestId ?? '(not available for this legacy pending request)'}\n` +
               `After the user submits, call get_secret("${name}") again to receive the encrypted blob URL.`,
           }],
         };
@@ -333,10 +337,14 @@ app.post('/submit/:token', (req: Request, res: Response) => {
     );
     return;
   }
+  if (COMPLETION_CALLBACK && filled.requestId) {
+    const event = buildCompletionEvent(filled.requestId, randomUUID());
+    void postCompletion(COMPLETION_CALLBACK, event);
+  }
   res.type('html').send(
     '<!doctype html><meta charset=utf-8><title>SSS</title>' +
     '<body style="font-family:sans-serif;max-width:480px;margin:4rem auto;color:#444">' +
-    '<h2>Saved</h2><p>Value for <code>' + filled + '</code> has been stored encrypted. ' +
+    '<h2>Saved</h2><p>Value for <code>' + escapeHtml(filled.name) + '</code> has been stored encrypted. ' +
     'You can close this tab.</p></body>',
   );
 });
