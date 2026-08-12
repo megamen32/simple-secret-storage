@@ -73,7 +73,15 @@ const transports: Record<string, StreamableHTTPServerTransport> = {};
 
 function makeServer(): McpServer {
   const s = new McpServer({ name: 'ask-secret', version: '1.0.0' });
-  registerAskSecretTools(s, createRuntimeOperations());
+  const runtimeOperations = createRuntimeOperations();
+  registerAskSecretTools(s, {
+    ...runtimeOperations,
+    async probeSecret({ name }) {
+      const meta = storage.getSecretMeta(name);
+      if (!meta || meta.pending) throw new Error('secret is not ready for this runtime identity');
+      return { status: 'ready', name };
+    },
+  });
   s.tool(
     'get_secret',
     'Get a secret by name. If found, returns the path to an AES-encrypted blob file ' +
