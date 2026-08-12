@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "bin": {
-    "sss-install": "bin/sss-install.mjs"
+    "ask-secret-mcp": "bin/ask-secret-mcp.mjs",
+    "ask-secret-run": "bin/sss-run.mjs",
+    "sss-install": "bin/sss-install.mjs",
+    "sss-run": "bin/sss-run.mjs"
   },
   "scripts": {
     "build": "tsc",

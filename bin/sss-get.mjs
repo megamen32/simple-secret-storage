@@ -131,6 +131,9 @@ if (!dUrl) {
   process.stderr.write(text + '\n');
   process.exit(3);
 }
+if (process.env.SSS_PROBE_ONLY === '1') {
+  process.exit(0);
+}
 
 const cipherRes = await fetch(dUrl);
 if (!cipherRes.ok) {
@@ -144,6 +147,9 @@ if (cipherRes.headers.get('content-type')?.startsWith('application/vnd.age')) {
   dec.addIdentity(id.secretKey);
   const plain = await dec.decrypt(armor.decode(cipher), 'text');
   process.stdout.write(plain);
+} else if (process.env.SSS_REQUIRE_AGE === '1') {
+  console.error('agent secret handoff requires an age-encrypted response');
+  process.exit(1);
 } else {
   // base64 fallback (SSS sees plaintext)
   const plain = Buffer.from(cipher, 'base64').toString('utf8');

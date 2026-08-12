@@ -211,13 +211,17 @@ export class Storage {
     if (!publicKey.startsWith('age1')) throw new Error('publicKey must start with age1');
     ensureDirs();
     const agents = readJson<Record<string, AgentKey>>(AGENTS_FILE());
+    const existing = agents[agent_id];
+    if (existing && existing.publicKey !== publicKey) {
+      throw new Error(`agent identity "${agent_id}" cannot be replaced`);
+    }
     const now = new Date().toISOString();
     const entry: AgentKey = {
       agent_id,
       publicKey,
-      registered: agents[agent_id]?.registered ?? now,
+      registered: existing?.registered ?? now,
       lastSeen: now,
-      label,
+      label: label ?? existing?.label,
     };
     agents[agent_id] = entry;
     writeJson(AGENTS_FILE(), agents);
