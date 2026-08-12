@@ -7,6 +7,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { Storage, SecretMeta } from './storage.js';
 import { ensureDirs, BLOBS_DIR } from './config.js';
 import { buildCompletionEvent, getCompletionCallback, postCompletion } from './completion-callback.js';
+import { createRuntimeOperations, registerAskSecretTools } from './ask-secret-tools.js';
 
 /* ================================================================
    ENV
@@ -71,7 +72,8 @@ void mcp;
 const transports: Record<string, StreamableHTTPServerTransport> = {};
 
 function makeServer(): McpServer {
-  const s = new McpServer({ name: 'sss', version: '1.0.0' });
+  const s = new McpServer({ name: 'ask-secret', version: '1.0.0' });
+  registerAskSecretTools(s, createRuntimeOperations());
   s.tool(
     'get_secret',
     'Get a secret by name. If found, returns the path to an AES-encrypted blob file ' +
