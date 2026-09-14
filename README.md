@@ -225,12 +225,17 @@ https://pswd.bezrabotnyi.com/i/<token>
 A simple password input form. POST goes to `/submit/<token>`, value is
 encrypted and stored. The link works once and expires.
 
+For a passwordless, anonymous upload that is not tied to a pending request,
+open `https://pswd.bezrabotnyi.com/secret`. The page accepts only the secret
+value, stores it encrypted under a generated UUID, and returns that opaque ID.
+
 ## Architecture
 
 ```
 User ─browser─→ nginx (pswd.bezrabotnyi.com, TLS, access_log off for /i/, /d/, /submit/)
                        └─127.0.0.1:8743─→ SSS (systemd, single Node process)
                                               ├─ /api/secrets   (Bearer, list/save/delete)
+                                              ├─ /secret       (anonymous create, returns ID)
                                               ├─ /i/<token>     (anonymous form)
                                               ├─ /submit/<token>(anonymous POST)
                                               ├─ /d/<token>     (one-time, age-cipher OR base64)

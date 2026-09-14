@@ -304,6 +304,102 @@ app.get('/d/:token', async (req: Request, res: Response) => {
 });
 
 /* ================================================================
+   PASSWORDLESS SECRET CREATION  /secret
+   No Bearer or access password is required. The server generates an
+   opaque ID, stores the submitted value encrypted, and returns only
+   that ID to the browser.
+   ================================================================ */
+
+app.get('/secret', (_req: Request, res: Response) => {
+  sendSecretHtml(res, 200, publicSecretFormHtml());
+});
+
+app.post('/secret', (req: Request, res: Response) => {
+  const value = typeof req.body?.value === 'string' ? req.body.value : '';
+  if (!value) {
+    sendSecretHtml(res, 400, publicSecretFormHtml('Please enter a non-empty value.'));
+    return;
+  }
+  if (value.length > 64 * 1024) {
+    sendSecretHtml(res, 413, publicSecretFormHtml('Value is too large.'));
+    return;
+  }
+
+  let id = randomUUID();
+  while (storage.getSecretMeta(id)) id = randomUUID();
+  storage.saveSecret(id, value);
+  sendSecretHtml(res, 201, publicSecretSavedHtml(id));
+});
+
+function sendSecretHtml(res: Response, status: number, html: string): void {
+  res.set('Cache-Control', 'no-store');
+  res.set('Referrer-Policy', 'no-referrer');
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.status(status).type('html').send(html);
+}
+
+function publicSecretFormHtml(error?: string): string {
+  return `<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>SSS — Add secret</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh;margin:0}
+  .wrap{max-width:420px;margin:6rem auto;padding:2rem;background:#161616;border:1px solid #333;border-radius:12px}
+  h1{font-size:1.2rem;margin:0 0 .4rem}
+  .sub,.hint{color:#888;font-size:.8rem;line-height:1.45}.sub{margin-bottom:1.5rem}.hint{margin-top:1rem}
+  .error{color:#fca5a5;background:#3b1111;border:1px solid #7f1d1d;border-radius:6px;padding:.65rem .8rem;margin-bottom:1rem;font-size:.8rem}
+  label{display:block;font-size:.75rem;color:#aaa;margin-bottom:.3rem}
+  input{width:100%;padding:.65rem .8rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#e0e0e0;font-size:.95rem;font-family:inherit;box-sizing:border-box}
+  input:focus{outline:none;border-color:#2563eb}
+  button{margin-top:1rem;width:100%;padding:.65rem;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;font-family:inherit}
+  button:hover{background:#1d4ed8}
+</style>
+</head>
+<body>
+<form class=wrap method=post action="/secret" autocomplete=off>
+  <h1>Add secret</h1>
+  <div class=sub>No account or access password required. You will receive an opaque ID.</div>
+  ${error ? `<div class=error role=alert>${escapeHtml(error)}</div>` : ''}
+  <label for=value>Secret value</label>
+  <input id=value type=password name=value placeholder="secret value" autofocus required>
+  <button type=submit>Save and get ID</button>
+  <div class=hint>The value is sent over HTTPS and stored encrypted with AES-256-GCM.</div>
+</form>
+</body>
+</html>`;
+}
+
+function publicSecretSavedHtml(id: string): string {
+  return `<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>SSS — Secret saved</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh;margin:0}
+  .wrap{max-width:520px;margin:6rem auto;padding:2rem;background:#161616;border:1px solid #333;border-radius:12px}
+  h1{font-size:1.2rem;margin:0 0 1rem}.label{color:#888;font-size:.8rem;margin-bottom:.35rem}
+  code{display:block;overflow-wrap:anywhere;background:#222;padding:.8rem;border-radius:6px;color:#bfdbfe;font-size:1rem;user-select:all}
+  p{color:#888;font-size:.8rem;line-height:1.45;margin:1rem 0 0}a{color:#60a5fa}
+</style>
+</head>
+<body>
+<main class=wrap>
+  <h1>Secret saved</h1>
+  <div class=label>Secret ID</div>
+  <code id="secret-id">${escapeHtml(id)}</code>
+  <p>Copy this ID now. The secret value is not shown again.</p>
+  <p><a href="/secret">Add another secret</a></p>
+</main>
+</body>
+</html>`;
+}
+
+/* ================================================================
    ANONYMOUS INPUT FORM  /i/<token>  +  /submit/<token>
    No Bearer needed — the input token is the credential. The token
    is a one-time 256-bit secret created by get_secret when the agent
