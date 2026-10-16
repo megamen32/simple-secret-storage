@@ -29,3 +29,23 @@ scopedmain публикации; новые формы с пользовател
 RAM768MiBsoft/1GiBhard, swap0/tasks128, временные данные128MiB; один workload.
 Fresh MemAvailable перед запуском; сохранить >=16GiB hostreserve. Live service
 доизменений~94MiB/11tasks; его действующие лимиты не повышать.
+
+## Принято
+
+SSS968a98c опубликован в origin/main и установлен17Oct02:06MSK кратким
+restart толькоsss.service. Bundle8f6c764 опубликован в upstream/master;
+pluginfd9df39 в origin/main. Scoped sync толькоsecret: Codex/Hermes/OpenCode/
+ZCode, текущая migratedCodexskill и legacycommand. Чужие bundleWIP сохранены.
+
+9focusedchecks PASS9.99с/пик224026624B; ownedcontainer удалён. Реальный
+CodexMCP ask_secret({}) сразу pending савтоименем; repeat возвращаеттотжеURL.
+Настоящий publicHTTPSGET inputURL=200/passwordfield; stdioruntime вернултотже
+pending без identityregistration и безdownload/secretfetch. Синтетический
+submit/ready и восстановление послеrestart проверены наisolatedstore.
+Private receipt/logs: .tmp/20261017-form/{receipt,live-proof,skill-sync}.json.
+
+Первопричина показанного transport send error сейчас не воспроизвелась:
+успешные пробы не доказывают, что исчезла любая внешняя сетевая проблема.
+Подтверждённые дефекты readiness-only/namequestion устранены; stateless SDK
+также устраняет конкретный отказ от старого MCPsession послеrestart.
+Никакие реальные secrets/пользовательские поля и соседние продукты не менялись.
