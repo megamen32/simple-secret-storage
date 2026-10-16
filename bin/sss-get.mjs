@@ -111,6 +111,22 @@ async function ensureRegistered(id) {
   return sid;
 }
 
+// Form requests need no runtime identity and must never mint or fetch a
+// download token. This fixed mode returns only the safe ask_secret envelope.
+if (process.env.SSS_REQUEST_ONLY === '1') {
+  const init = await mcp('initialize', {protocolVersion: '2024-11-05', capabilities: {}, clientInfo: {name: 'ask-secret-form', version: '1'}});
+  const requestId=process.argv[3];
+  const response = await mcp('tools/call', {name: 'ask_secret', arguments: {name: NAME, ...(requestId ? {request_id: requestId} : {})}}, init.sid);
+  const reply = parseSse(response.text);
+  if (response.status !== 200 || reply.error || reply.result?.isError) {
+    console.error('AskSecret form request failed');
+    process.exit(1);
+  }
+  const result = JSON.parse(reply.result?.content?.[0]?.text || '{}');
+  process.stdout.write(JSON.stringify(result));
+  process.exit(0);
+}
+
 const id = await ensureIdentity();
 const sid = await ensureRegistered(id);
 

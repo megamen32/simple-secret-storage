@@ -6,6 +6,20 @@ The agent asks for a secret **by name**. The server returns a one-time URL
 to an **age-encrypted blob** (X25519). Only the agent's private key can
 decrypt it. The server never sees the plaintext in the wire response.
 
+## Request a form
+
+Call `ask_secret({})`: one call returns a browser input link and an automatic
+random name. An optional `name` reuses a named handoff; an optional UUID
+`request_id` keeps unnamed retries on the same form. Never ask the human to
+invent a name. The form tool returns `pending` with `input_url`, or `ready`,
+and never retrieves a secret or a download URL. After the user submits, use
+only the separately authorized stdin consumer. `get_secret` also accepts an
+omitted name for older clients.
+
+HTTP MCP uses the official SDK's stateless JSON transport. Pending forms and
+encrypted secrets stay in storage across restarts; stale MCP session headers
+do not block the next call. The stdio entrypoint uses the same tool definitions.
+
 ## Why
 
 When an LLM agent needs a password / API key / token, the worst thing is

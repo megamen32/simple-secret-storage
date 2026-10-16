@@ -13,7 +13,7 @@ test('runtime maps a named profile to sss-run without accepting a caller command
   const receipt = join(cwd, 'receipt.json');
   const probeReceipt = join(cwd, 'probe.json');
   writeFileSync(fakeRun, `import { writeFileSync } from 'node:fs';\nwriteFileSync(process.env.RECEIPT, JSON.stringify({argv: process.argv.slice(2), requireAge: process.env.SSS_REQUIRE_AGE}));\n`);
-  writeFileSync(fakeGet, `import { writeFileSync } from 'node:fs';\nwriteFileSync(process.env.PROBE_RECEIPT, JSON.stringify({argv: process.argv.slice(2), probeOnly: process.env.SSS_PROBE_ONLY, requireAge: process.env.SSS_REQUIRE_AGE}));\n`);
+  writeFileSync(fakeGet, `import { writeFileSync } from 'node:fs';\nwriteFileSync(process.env.PROBE_RECEIPT, JSON.stringify({argv: process.argv.slice(2), requestOnly: process.env.SSS_REQUEST_ONLY}));\nconsole.log(JSON.stringify({status:'ready',name:process.argv[2]}));\n`);
   const previous = {
     SSS_RUN_BIN: process.env.SSS_RUN_BIN,
     SSS_GET_BIN: process.env.SSS_GET_BIN,
@@ -30,7 +30,7 @@ test('runtime maps a named profile to sss-run without accepting a caller command
     const operations = createRuntimeOperations();
     assert.deepEqual(await operations.probeSecret({ name: 'demo' }), { status: 'ready', name: 'demo' });
     const probed = JSON.parse(await import('node:fs').then(({ readFileSync }) => readFileSync(probeReceipt, 'utf8')));
-    assert.deepEqual(probed, { argv: ['demo'], probeOnly: '1', requireAge: '1' });
+    assert.deepEqual(probed, { argv: ['demo'], requestOnly: '1' });
     assert.deepEqual(await operations.runProfile({ name: 'demo', profile: 'canary' }), { status: 'completed', name: 'demo', profile: 'canary' });
     const received = JSON.parse(await import('node:fs').then(({ readFileSync }) => readFileSync(receipt, 'utf8')));
     assert.deepEqual(received.argv, ['demo', '--', '/usr/bin/true', 'fixed']);

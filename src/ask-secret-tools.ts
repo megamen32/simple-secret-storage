@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
@@ -11,9 +12,15 @@ const DEFAULT_SSS_RUN = resolve(HERE, '../bin/sss-run.mjs');
 const DEFAULT_SSS_GET = resolve(HERE, '../bin/sss-get.mjs');
 
 export type AskSecretOperations = {
-  probeSecret(input: { name: string }): unknown | Promise<unknown>;
+  probeSecret(input: { name: string; request_id?: string }): unknown | Promise<unknown>;
   runProfile(input: { name: string; profile: string }): unknown | Promise<unknown>;
 };
+
+// A missing label is never a reason to interrupt the human. A supplied request
+// identity also makes retries of an unnamed handoff resolve the same form.
+export function secretRequestName(name?: string, requestId?: string): string {
+  return name?.trim() || `secret_${requestId || randomUUID()}`;
+}
 
 function textResult(result: unknown) {
   return {
@@ -27,9 +34,12 @@ function textResult(result: unknown) {
 export function registerAskSecretTools(server: McpServer, operations: AskSecretOperations): void {
   server.tool(
     'ask_secret',
-    'Check whether a named secret is ready. The secret value is never returned to the AI and is not consumed by this check.',
-    { name: z.string().min(1).describe('Provisioned secret name') },
-    async ({ name }) => textResult(await operations.probeSecret({ name })),
+    'Open a one-time browser form for entering a secret, or return ready when already supplied. Omit name to generate one automatically; never ask the user for a name. Returns only status and an input URL, never the secret or a download URL.',
+    {
+      name: z.string().optional().describe('Optional label; generated automatically when omitted'),
+      request_id: z.string().uuid().optional().describe('Reuse this optional request identity when retrying an unnamed form'),
+    },
+    async ({ name, request_id }) => textResult(await operations.probeSecret({ name: secretRequestName(name, request_id), ...(request_id ? {request_id} : {}) })),
   );
   server.tool(
     'ask_secret_run',
@@ -69,14 +79,39 @@ function runOpaque(argv: string[], extraEnv: Record<string, string>): Promise<vo
   });
 }
 
+function requestOpaque(name: string, requestId?: string): Promise<unknown> {
+  return new Promise((resolveRequest, rejectRequest) => {
+    const child = spawn(process.execPath, [process.env.SSS_GET_BIN || DEFAULT_SSS_GET, name, ...(requestId ? [requestId] : [])], {
+      env: { ...process.env, SSS_REQUEST_ONLY: '1' },
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const timer = setTimeout(() => child.kill(), 20_000);
+    let output = '';
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', chunk => {
+      output += chunk;
+      if (output.length > 8192) child.kill();
+    });
+    child.once('error', () => { clearTimeout(timer); rejectRequest(new Error('AskSecret form request failed to start')); });
+    child.once('close', code => {
+      clearTimeout(timer);
+      if (code !== 0 || output.length > 8192) return rejectRequest(new Error('AskSecret form request failed'));
+      try {
+        const result = JSON.parse(output);
+        if (result.name !== name || !['ready', 'pending'].includes(result.status)) throw new Error();
+        if (result.status === 'ready') return resolveRequest({status: 'ready', name});
+        const url = new URL(result.input_url);
+        if (!['http:', 'https:'].includes(url.protocol) || !/^\/i\/[A-Za-z0-9_-]+$/.test(url.pathname) || url.username || url.password || url.search || url.hash) throw new Error();
+        resolveRequest({status: 'pending', name, input_url: url.href, request_id: result.request_id});
+      } catch { rejectRequest(new Error('AskSecret returned an invalid form response')); }
+    });
+  });
+}
+
 export function createRuntimeOperations(): AskSecretOperations {
   return {
-    async probeSecret({ name }) {
-      await runOpaque(
-        [process.env.SSS_GET_BIN || DEFAULT_SSS_GET, name],
-        { SSS_REQUIRE_AGE: '1', SSS_PROBE_ONLY: '1' },
-      );
-      return { status: 'ready', name };
+    async probeSecret({ name, request_id }) {
+      return requestOpaque(name, request_id);
     },
     async runProfile({ name, profile }) {
       const selected = configuredProfiles()[profile];

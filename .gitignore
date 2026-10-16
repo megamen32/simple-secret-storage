@@ -3,6 +3,7 @@ dist/
 
 # Dependencies
 node_modules/
+.tmp/
 
 # Hermes plans workspace (not part of the product)
 .hermes/

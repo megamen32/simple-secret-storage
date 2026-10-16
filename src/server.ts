@@ -1,13 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { Storage, SecretMeta } from './storage.js';
 import { ensureDirs, BLOBS_DIR } from './config.js';
 import { buildCompletionEvent, getCompletionCallback, postCompletion } from './completion-callback.js';
-import { createRuntimeOperations, registerAskSecretTools } from './ask-secret-tools.js';
+import { createRuntimeOperations, registerAskSecretTools, secretRequestName } from './ask-secret-tools.js';
 
 /* ================================================================
    ENV
@@ -39,8 +38,7 @@ setInterval(cleanupTokens, 60_000);
    ================================================================ */
 const app = express();
 
-/* Order: app.all('/mcp') AFTER express.json() — stateless transport
-   takes pre-parsed JSON body as parsedBody (no session, no stream). */
+/* The SDK transport takes the already parsed JSON body. */
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
@@ -56,42 +54,36 @@ function auth(req: Request, res: Response, next: NextFunction): void {
 /* ================================================================
    MCP SERVER (Streamable HTTP)
    ================================================================ */
-const mcp = new McpServer({ name: 'sss', version: '1.0.0' });
-/* Note: tools are registered per-session in makeServer() below —
-   re-registering on this shared instance would conflict with the
-   stateful per-session transport model. Keep `mcp` as a placeholder
-   so other code (e.g. session-end hooks) can be added later. */
-void mcp;
-
 /* ---- Mount MCP on Express ---- */
-/* ---- Stateful MCP transport (per-session) ----
-   The MCP SDK requires a fresh StreamableHTTPServerTransport per session in
-   stateful mode. We keep a map sessionId -> transport so subsequent calls
-   (tools/list, tools/call) reuse the same transport. A fresh McpServer is
-   created per session and tools are registered on it. */
-const transports: Record<string, StreamableHTTPServerTransport> = {};
+// All durable handoff state belongs to Storage. The MCP connection has no
+// subscriptions or per-client state: the SDK's stateless JSON transport avoids
+// stale session IDs after a service restart and unnecessary long-lived SSE.
 
 function makeServer(): McpServer {
   const s = new McpServer({ name: 'ask-secret', version: '1.0.0' });
   const runtimeOperations = createRuntimeOperations();
   registerAskSecretTools(s, {
     ...runtimeOperations,
-    async probeSecret({ name }) {
+    async probeSecret({ name, request_id }) {
       const meta = storage.getSecretMeta(name);
-      if (!meta || meta.pending) throw new Error('secret is not ready for this runtime identity');
+      if (!meta || meta.pending) {
+        const {token, requestId} = storage.requestPending(name, request_id);
+        return {status: 'pending', name, input_url: `${SERVER_URL}/i/${token}`, request_id: requestId};
+      }
       return { status: 'ready', name };
     },
   });
   s.tool(
     'get_secret',
-    'Get a secret by name. If found, returns the path to an AES-encrypted blob file ' +
+    'Request a secret; name is optional and generated automatically. For a browser form prefer ask_secret, which never returns download URLs. If found, returns the path to an AES-encrypted blob file ' +
       'on disk plus a one-time URL to fetch it. The LLM must pipe the file contents ' +
       'into its target command — NEVER read or display the file (it is opaque bytes). ' +
       'If not found, tells the agent to ask the user to create it via the web UI.',
-    { name: z.string().describe('Secret name'),
+    { name: z.string().optional().describe('Optional secret name; generated automatically if omitted'),
       agent_id: z.string().optional().describe('Agent ID registered via register_agent. If provided, the value is encrypted with the agent\'s age public key (true E2E); otherwise it is returned as base64 (SSS sees the plaintext).'),
       request_id: z.string().uuid().optional().describe('Opaque Human Request owner ID used only for completion correlation.') },
-    async ({ name, agent_id, request_id }) => {
+    async ({ name: suppliedName, agent_id, request_id }) => {
+      const name = secretRequestName(suppliedName, request_id);
       const meta = storage.getSecretMeta(name);
       // Pending = user hasn't entered the value yet. Surface the
       // user-input URL so the agent forwards it again.
@@ -203,36 +195,20 @@ app.all('/mcp', async (req: any, res: any, next: NextFunction) => {
     res.status(401).json({ error: 'unauthorized' });
     return;
   }
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    res.status(405).end();
+    return;
+  }
+  const server = makeServer();
+  const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined, enableJsonResponse: true});
+  res.on('close', () => { void transport.close(); void server.close(); });
   try {
-    const sessionId =
-      (req.headers['mcp-session-id'] as string | undefined) ?? undefined;
-    let transport: StreamableHTTPServerTransport;
-    if (sessionId && transports[sessionId]) {
-      transport = transports[sessionId];
-    } else if (!sessionId && isInitializeRequest(req.body)) {
-      transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: () => randomUUID(),
-        onsessioninitialized: (sid: string) => {
-          transports[sid] = transport;
-        },
-      });
-      transport.onclose = () => {
-        const sid = transport.sessionId;
-        if (sid) delete transports[sid];
-      };
-      await makeServer().connect(transport);
-    } else {
-      res.status(400).json({
-        jsonrpc: '2.0',
-        error: { code: -32000, message: 'Bad Request: no valid session ID provided' },
-        id: null,
-      });
-      return;
-    }
+    await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
   } catch (e: any) {
-    console.error('[mcp] error:', e?.message ?? e, e?.stack);
-    if (!res.headersSent) res.status(500).json({ error: e?.message ?? 'internal error' });
+    console.error('[mcp] request failed');
+    if (!res.headersSent) res.status(500).json({ error: 'internal error' });
   }
 });
 
