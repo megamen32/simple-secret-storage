@@ -13,6 +13,7 @@ import {
   SSO_LOGIN_URL,
   SSO_LOGOUT_URL,
   sanitizeIdentity,
+  sanitizeName,
 } from './config.js';
 import { buildCompletionEvent, getCompletionCallback, postCompletion } from './completion-callback.js';
 import { createRuntimeOperations, registerAskSecretTools, secretRequestName } from './ask-secret-tools.js';
@@ -37,8 +38,16 @@ const storage = new Storage();
 /* One-time decrypt tokens: token → { name, expires } */
 const dTokens = new Map<string, { name: string; expires: number; encoding?: 'age' | 'base64'; agentId?: string }>();
 function retargetDecryptTokens(from: string, to: string): void {
+  const cleanFrom = sanitizeName(from);
+  const cleanTo = sanitizeName(to);
   for (const entry of dTokens.values()) {
-    if (entry.name === from) entry.name = to;
+    if (sanitizeName(entry.name) === cleanFrom) entry.name = cleanTo;
+  }
+}
+function revokeDecryptTokens(name: string): void {
+  const cleanName = sanitizeName(name);
+  for (const [token, entry] of dTokens) {
+    if (sanitizeName(entry.name) === cleanName) dTokens.delete(token);
   }
 }
 function cleanupTokens(): void {
@@ -169,7 +178,7 @@ function makeServer(): McpServer {
       }
       const token = randomBytes(16).toString('hex');
       dTokens.set(token, {
-        name,
+        name: sanitizeName(name),
         expires: Date.now() + 5 * 60_000,
         encoding: agent_id ? 'age' : 'base64',
         agentId: agent_id,
@@ -248,6 +257,7 @@ function makeServer(): McpServer {
     { name: z.string().describe('Secret name to delete') },
     async ({ name }) => {
       const ok = storage.deleteSecret(name);
+      if (ok) revokeDecryptTokens(name);
       return { content: [{ type: 'text' as const, text: ok ? `Deleted "${name}".` : `Not found: "${name}".` }] };
     },
   );
@@ -376,8 +386,10 @@ app.post('/api/secrets/:name/rename', auth, (req: Request, res: Response) => {
 });
 
 app.delete('/api/secrets/:name', auth, (req: Request, res: Response) => {
-  const ok = storage.deleteSecret(req.params.name as string);
+  const name = req.params.name as string;
+  const ok = storage.deleteSecret(name);
   if (!ok) { res.status(404).json({ error: 'not found' }); return; }
+  revokeDecryptTokens(name);
   res.json({ ok: true });
 });
 
