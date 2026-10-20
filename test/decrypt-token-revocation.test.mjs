@@ -129,4 +129,17 @@ test('deleting a secret revokes its outstanding one-time decrypt URLs before nam
   assert.match(mcpRename.content[0].text, /Renamed/);
   await create('reused-old-name-after-mcp-rename', 'mcp_rename_fixture');
   await assertDelivers(mcpRenameUrl, 'mcp-rename-original-test-value');
+
+  const restMissingSelfRename = await fetch(`${origin}/api/secrets/missing_self_rename_fixture/rename`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ name: 'missing_self_rename_fixture' }),
+  });
+  assert.equal(restMissingSelfRename.status, 404);
+
+  const mcpMissingSelfRename = await client.callTool({
+    name: 'rename_secret',
+    arguments: { name: 'missing_self_rename_fixture', new_name: 'missing_self_rename_fixture' },
+  });
+  assert.match(mcpMissingSelfRename.content[0].text, /Not found/);
 });

@@ -213,10 +213,9 @@ export class Storage {
     } catch (e: any) {
       return { status: 'invalid', message: e?.message ?? 'invalid secret name' };
     }
-    if (source === target) return { status: 'renamed', from: source, to: target };
-
     const secrets = readJson<Record<string, SecretMeta>>(SECRETS_FILE());
     if (!Object.prototype.hasOwnProperty.call(secrets, source)) return { status: 'not_found' };
+    if (source === target) return { status: 'renamed', from: source, to: target };
     if (Object.prototype.hasOwnProperty.call(secrets, target)) return { status: 'conflict' };
 
     const sourceBlob = join(BLOBS_DIR(), `${source}.enc`);
