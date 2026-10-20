@@ -12,7 +12,7 @@ export function createAskSecretServer({ probeSecret, runProfile }) {
   if (typeof probeSecret !== 'function' || typeof runProfile !== 'function') {
     throw new TypeError('AskSecret requires probeSecret and runProfile operations');
   }
-  const server = new McpServer({ name: 'ask-secret', version: '1.0.0' });
+  const server = new McpServer({ name: 'simple-secret-storage', version: '1.0.0' });
   registerAskSecretTools(server, {probeSecret, runProfile});
   return server;
 }

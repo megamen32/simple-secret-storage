@@ -127,7 +127,7 @@ function auth(req: Request, res: Response, next: NextFunction): void {
 // stale session IDs after a service restart and unnecessary long-lived SSE.
 
 function makeServer(): McpServer {
-  const s = new McpServer({ name: 'ask-secret', version: '1.0.0' });
+  const s = new McpServer({ name: 'simple-secret-storage', version: '1.0.0' });
   const runtimeOperations = createRuntimeOperations();
   registerAskSecretTools(s, {
     ...runtimeOperations,
@@ -142,10 +142,7 @@ function makeServer(): McpServer {
   });
   s.tool(
     'get_secret',
-    'Request a secret; name is optional and generated automatically. For a browser form prefer ask_secret, which never returns download URLs. If found, returns the path to an AES-encrypted blob file ' +
-      'on disk plus a one-time URL to fetch it. The LLM must pipe the file contents ' +
-      'into its target command — NEVER read or display the file (it is opaque bytes). ' +
-      'If not found, tells the agent to ask the user to create it via the web UI.',
+    'Request a secret; name is optional and generated automatically. For a browser form prefer ask_secret, which never returns download URLs. If found, returns a one-time /d/ URL: age-encrypted for a registered agent, otherwise base64. The URL is a short-lived credential; never print or expose it. The value itself is not returned. If not found, tells the agent to ask the user to create it via the web UI.',
     { name: z.string().optional().describe('Optional secret name; generated automatically if omitted'),
       agent_id: z.string().optional().describe('Agent ID registered via register_agent. If provided, the value is encrypted with the agent\'s age public key (true E2E); otherwise it is returned as base64 (SSS sees the plaintext).'),
       request_id: z.string().uuid().optional().describe('Opaque Human Request owner ID used only for completion correlation.') },
@@ -322,6 +319,15 @@ app.get('/api/session', auth, (req: Request, res: Response) => {
 
 app.get('/api/secrets', auth, (_req: Request, res: Response) => {
   res.json({ secrets: storage.listSecrets() });
+});
+
+/* Reveal one value only on explicit request. This is deliberately separate
+   from the metadata list and is never cacheable by a browser or proxy. */
+app.get('/api/secrets/:name/value', auth, (req: Request, res: Response) => {
+  res.set({ 'Cache-Control': 'no-store, private', Pragma: 'no-cache' });
+  const value = storage.decryptSecret(req.params.name as string);
+  if (value === null) { res.status(404).json({ error: 'not found' }); return; }
+  res.json({ value });
 });
 
 app.post('/api/secrets', auth, (req: Request, res: Response) => {
@@ -639,6 +645,7 @@ td a{color:#60a5fa;text-decoration:none}td a:hover{text-decoration:underline}
 #logout{margin-left:auto}
 .who{margin-left:auto;color:#666;font-size:.8rem}
 .pend{color:#eab308;font-size:.7rem;border:1px solid #4a3a00;border-radius:4px;padding:0 .3rem;margin-left:.4rem}
+.secret-value{display:block;max-width:32rem;overflow-wrap:anywhere;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,monospace;color:#ddd;margin-top:.4rem}
 </style>
 </head>
 <body>
@@ -730,6 +737,7 @@ function showDash(){
     const name=button.getAttribute('data-name')||'';
     if(button.getAttribute('data-action')==='rename')doRename(name);
     else if(button.getAttribute('data-action')==='delete')doDelete(name);
+    else if(button.getAttribute('data-action')==='reveal')doReveal(button,name);
   });
   const lo=document.getElementById('logout');
   if(lo)lo.onclick=logout;
@@ -760,10 +768,25 @@ async function loadSecrets(){
       '<td>'+(s.meta?.url?'<a href="'+esc(s.meta.url)+'" target="_blank">'+esc(s.meta.url)+'</a>':'')+'</td>'+
       '<td>'+esc(s.meta?.account)+'</td>'+
       '<td style="color:#555;font-size:.75rem">'+new Date(s.meta.created).toLocaleDateString()+'</td>'+
-      '<td class="actions"><button class="btn btn-g btn-sm" data-action="rename" data-name="'+esc(s.name)+'">Rename</button>'+
+      '<td class="actions">'+(s.meta?.pending?'':'<button class="btn btn-g btn-sm" data-action="reveal" data-name="'+esc(s.name)+'">Show</button>')+
+      '<button class="btn btn-g btn-sm" data-action="rename" data-name="'+esc(s.name)+'">Rename</button>'+
       '<button class="btn btn-d btn-sm" data-action="delete" data-name="'+esc(s.name)+'">Del</button></td>'+
-    '</tr>').join('');
+      '</tr>'+(s.meta?.pending?'':'<tr><td colspan="6"><span class="secret-value" data-secret-value="'+esc(s.name)+'" hidden></span></td></tr>')
+    ).join('');
   }catch(e){alert(e.message);}
+}
+async function doReveal(button,name){
+  const row=button.closest('tr')?.nextElementSibling?.querySelector('[data-secret-value]');
+  if(!row)return;
+  if(button.getAttribute('data-visible')==='true'){
+    row.textContent='';row.hidden=true;button.setAttribute('data-visible','false');button.textContent='Show';return;
+  }
+  button.disabled=true;
+  try{
+    const d=await api('/api/secrets/'+encodeURIComponent(name)+'/value');
+    row.textContent=d.value;row.hidden=false;button.setAttribute('data-visible','true');button.textContent='Hide';
+  }catch(e){alert(e.message);}
+  finally{button.disabled=false;}
 }
 async function doSave(){
   const name=document.getElementById('f-name').value.trim();

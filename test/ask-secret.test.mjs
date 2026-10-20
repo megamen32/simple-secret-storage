@@ -5,7 +5,7 @@ import test from 'node:test';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 
-test('agent discovery has a narrow retrieval/run-only AskSecret entrypoint', async () => {
+test('stdio MCP identifies as SSS and keeps the retrieval/run-only AskSecret entrypoint', async () => {
   const entrypoint = new URL('../bin/ask-secret-mcp.mjs', import.meta.url);
   assert.equal(
     existsSync(entrypoint),
@@ -22,6 +22,7 @@ test('agent discovery has a narrow retrieval/run-only AskSecret entrypoint', asy
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
+  assert.equal(client.getServerVersion()?.name, 'simple-secret-storage');
   const listed = await client.listTools();
   assert.deepEqual(listed.tools.map(tool => tool.name).sort(), ['ask_secret', 'ask_secret_run']);
   const serialized = JSON.stringify(listed.tools);
