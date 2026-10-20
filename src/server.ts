@@ -722,6 +722,15 @@ function showDash(){
     '<tbody id="tbody"></tbody></table>'+
     '<div class="empty" id="empty" style="display:none">No secrets yet</div>'+
     '</div>';
+  document.getElementById('tbody').addEventListener('click',e=>{
+    const target=e.target;
+    if(!(target instanceof Element))return;
+    const button=target.closest('button[data-action]');
+    if(!button)return;
+    const name=button.getAttribute('data-name')||'';
+    if(button.getAttribute('data-action')==='rename')doRename(name);
+    else if(button.getAttribute('data-action')==='delete')doDelete(name);
+  });
   const lo=document.getElementById('logout');
   if(lo)lo.onclick=logout;
   const so=document.getElementById('signout');
@@ -751,8 +760,8 @@ async function loadSecrets(){
       '<td>'+(s.meta?.url?'<a href="'+esc(s.meta.url)+'" target="_blank">'+esc(s.meta.url)+'</a>':'')+'</td>'+
       '<td>'+esc(s.meta?.account)+'</td>'+
       '<td style="color:#555;font-size:.75rem">'+new Date(s.meta.created).toLocaleDateString()+'</td>'+
-      '<td class="actions"><button class="btn btn-g btn-sm" onclick="doRename(\''+esc(s.name)+'\')">Rename</button>'+
-      '<button class="btn btn-d btn-sm" onclick="doDelete(\''+esc(s.name)+'\')">Del</button></td>'+
+      '<td class="actions"><button class="btn btn-g btn-sm" data-action="rename" data-name="'+esc(s.name)+'">Rename</button>'+
+      '<button class="btn btn-d btn-sm" data-action="delete" data-name="'+esc(s.name)+'">Del</button></td>'+
     '</tr>').join('');
   }catch(e){alert(e.message);}
 }
