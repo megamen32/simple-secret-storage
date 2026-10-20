@@ -220,6 +220,8 @@ export class Storage {
       copyFileSync(sourceBlob, targetBlob);
       const targetFd = openSync(targetBlob, 'r');
       try { fsyncSync(targetFd); } finally { closeSync(targetFd); }
+      const dirFd = openSync(dirname(targetBlob), 'r');
+      try { fsyncSync(dirFd); } finally { closeSync(dirFd); }
     }
 
     const meta = secrets[source];
