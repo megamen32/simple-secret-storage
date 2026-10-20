@@ -36,6 +36,11 @@ const storage = new Storage();
 
 /* One-time decrypt tokens: token → { name, expires } */
 const dTokens = new Map<string, { name: string; expires: number; encoding?: 'age' | 'base64'; agentId?: string }>();
+function retargetDecryptTokens(from: string, to: string): void {
+  for (const entry of dTokens.values()) {
+    if (entry.name === from) entry.name = to;
+  }
+}
 function cleanupTokens(): void {
   const now = Date.now();
   for (const [t, v] of dTokens) if (v.expires < now) dTokens.delete(t);
@@ -262,6 +267,7 @@ function makeServer(): McpServer {
     async ({ name, new_name }) => {
       const result = storage.renameSecret(name, new_name);
       if (result.status === 'renamed') {
+        retargetDecryptTokens(result.from, result.to);
         return {
           content: [{
             type: 'text' as const,
@@ -359,9 +365,7 @@ app.post('/api/secrets/:name/rename', auth, (req: Request, res: Response) => {
   }
   /* One-time decrypt URLs issued before the rename still point at the
      old name — retarget them so they keep working. */
-  for (const entry of dTokens.values()) {
-    if (entry.name === result.from) entry.name = result.to;
-  }
+  retargetDecryptTokens(result.from, result.to);
   res.json({ ok: true, name: result.to, renamed_from: result.from });
 });
 

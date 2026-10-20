@@ -1,5 +1,8 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync, copyFileSync } from 'node:fs';
-import { join } from 'node:path';
+import {
+  readFileSync, writeFileSync, unlinkSync, existsSync, copyFileSync,
+  openSync, closeSync, fsyncSync, renameSync,
+} from 'node:fs';
+import { dirname, join } from 'node:path';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { encrypt, decrypt, generateKey, validateKey, encryptForRecipient } from './crypto.js';
 import { sanitizeName, SSS_DIR, BLOBS_DIR, KEY_FILE, SECRETS_FILE, ensureDirs } from './config.js';
@@ -83,7 +86,23 @@ function readJson<T = Record<string, any>>(path: string): T {
 }
 
 function writeJson(path: string, data: Record<string, any>): void {
-  writeFileSync(path, JSON.stringify(data, null, 2) + '\n', { mode: 0o600 });
+  const dir = dirname(path);
+  const temp = join(dir, `.${randomUUID()}.tmp`);
+  let fd: number | undefined;
+  try {
+    fd = openSync(temp, 'wx', 0o600);
+    writeFileSync(fd, JSON.stringify(data, null, 2) + '\n', 'utf8');
+    fsyncSync(fd);
+    closeSync(fd);
+    fd = undefined;
+    renameSync(temp, path);
+    const dirFd = openSync(dir, 'r');
+    try { fsyncSync(dirFd); } finally { closeSync(dirFd); }
+  } catch (error) {
+    if (fd !== undefined) closeSync(fd);
+    if (existsSync(temp)) unlinkSync(temp);
+    throw error;
+  }
 }
 
 export class Storage {
@@ -197,7 +216,11 @@ export class Storage {
     const sourceBlob = join(BLOBS_DIR(), `${source}.enc`);
     const targetBlob = join(BLOBS_DIR(), `${target}.enc`);
     if (existsSync(targetBlob)) return { status: 'conflict' };
-    if (existsSync(sourceBlob)) copyFileSync(sourceBlob, targetBlob);
+    if (existsSync(sourceBlob)) {
+      copyFileSync(sourceBlob, targetBlob);
+      const targetFd = openSync(targetBlob, 'r');
+      try { fsyncSync(targetFd); } finally { closeSync(targetFd); }
+    }
 
     const meta = secrets[source];
     delete secrets[source];
@@ -209,7 +232,11 @@ export class Storage {
     });
     writeJson(SECRETS_FILE(), secrets);
 
-    if (existsSync(sourceBlob)) unlinkSync(sourceBlob);
+    if (existsSync(sourceBlob)) {
+      unlinkSync(sourceBlob);
+      const dirFd = openSync(dirname(sourceBlob), 'r');
+      try { fsyncSync(dirFd); } finally { closeSync(dirFd); }
+    }
     return { status: 'renamed', from: source, to: target };
   }
 
