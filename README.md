@@ -222,10 +222,26 @@ hashed at the MCP handler level. That's a five-line patch.
 
 | Tool             | Parameters                                                | What it returns                                                                                                                  |
 | ---------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ask_secret` | `name?`, `request_id?` | `pending` with a one-time browser input URL, or `ready`; never a secret value or download URL. |
+| `ask_secret_run` | `name`, `profile` | Runs a configured consumer with the secret on stdin; no value in the result, arguments or environment. |
 | `register_agent` | `agent_id`, `public_key` (age1...), `label?`              | Confirmation. Persists the public key in `~/.sss/agents.json`.                                                                   |
 | `get_secret`     | `name`, `agent_id?`                                       | If pending → returns `/i/<token>` URL for the user to submit the value. If ready → returns `/d/<token>` URL (age if `agent_id`, else base64) with pipe-usage hint. |
 | `list_secrets`   | —                                                         | Names + metadata (no values).                                                                                                    |
 | `delete_secret`  | `name`                                                    | Confirmation.                                                                                                                    |
+| `rename_secret` | `name`, `new_name` | Renames the stored entry without reading or returning its value. |
+
+## Manage long-lived secrets
+
+Open `https://pswd.bezrabotnyi.com/` to manage named secrets. The page and its
+browser management API use the existing `auth.bezrabotnyi.com` cookie SSO.
+The page lists metadata and supports adding, renaming and deleting entries;
+secret values are never shown when listing them. The `/mcp` endpoint keeps its
+Bearer-token authentication for agent clients.
+
+This SSO gate is limited to the management page and `/api/` browser requests.
+The anonymous `/secret` upload and one-time `/i/<token>` input links remain
+available under their existing contracts. A link token grants one pending
+submission; the management list does not expose it.
 
 ## Web UI for the user
 
@@ -248,7 +264,7 @@ value, stores it encrypted under a generated UUID, and returns that opaque ID.
 ```
 User ─browser─→ nginx (pswd.bezrabotnyi.com, TLS, access_log off for /i/, /d/, /submit/)
                        └─127.0.0.1:8743─→ SSS (systemd, single Node process)
-                                              ├─ /api/secrets   (Bearer, list/save/delete)
+                                              ├─ /api/secrets   (SSO browser or Bearer, list/save/rename/delete)
                                               ├─ /secret       (anonymous create, returns ID)
                                               ├─ /i/<token>     (anonymous form)
                                               ├─ /submit/<token>(anonymous POST)

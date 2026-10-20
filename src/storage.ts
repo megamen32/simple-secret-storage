@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, unlinkSync, existsSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { encrypt, decrypt, generateKey, validateKey, encryptForRecipient } from './crypto.js';
@@ -33,9 +33,48 @@ export interface SecretMeta {
   requestId?: string;
 }
 
+/** Outcome of a rename request. */
+export type RenameSecretResult =
+  | { status: 'renamed'; from: string; to: string }
+  | { status: 'not_found' }
+  | { status: 'conflict' }
+  | { status: 'invalid'; message: string };
+
 export interface PendingFillResult {
   name: string;
   requestId?: string;
+}
+
+/** Meta as it may leave the process over the API.
+ *
+ *  `inputToken` is a one-time bearer capability: it opens the /i/<token>
+ *  form for a pending secret. It must never be serialized into an API
+ *  response, otherwise listing the store hands the caller the ability
+ *  to overwrite a pending value. `sha256` is dropped for the same
+ *  reason class — it is a verifier of the plaintext, which would turn
+ *  the list endpoint into an offline guessing oracle.
+ *
+ *  `pending` and `requestId` are kept: they carry status and request
+ *  correlation without being usable as a credential. */
+export interface PublicSecretMeta {
+  description?: string;
+  url?: string;
+  account?: string;
+  created: string;
+  pending?: boolean;
+  requestId?: string;
+}
+
+/** Strip token-only and verifier fields from a stored meta. */
+export function publicSecretMeta(meta: SecretMeta): PublicSecretMeta {
+  return {
+    description: meta.description,
+    url: meta.url,
+    account: meta.account,
+    created: meta.created,
+    pending: meta.pending,
+    requestId: meta.requestId,
+  };
 }
 
 function readJson<T = Record<string, any>>(path: string): T {
@@ -128,9 +167,50 @@ export class Storage {
     return true;
   }
 
-  listSecrets(): Array<{ name: string; meta: SecretMeta }> {
+  /** List stored secrets with redacted metadata. The raw meta — and
+   *  with it the one-time input token — stays inside the process. */
+  listSecrets(): Array<{ name: string; meta: PublicSecretMeta }> {
     const secrets = readJson<Record<string, SecretMeta>>(SECRETS_FILE());
-    return Object.entries(secrets).map(([name, meta]) => ({ name, meta }));
+    return Object.entries(secrets).map(([name, meta]) => ({ name, meta: publicSecretMeta(meta) }));
+  }
+
+  /** Rename a secret without touching its value.
+   *
+   *  The encrypted blob is copied to the new name before the metadata
+   *  is switched and the old blob is removed afterwards, so an
+   *  interrupted rename never loses the stored value. */
+  renameSecret(from: string, to: string): RenameSecretResult {
+    let source: string;
+    let target: string;
+    try {
+      source = sanitizeName(from);
+      target = sanitizeName(to);
+    } catch (e: any) {
+      return { status: 'invalid', message: e?.message ?? 'invalid secret name' };
+    }
+    if (source === target) return { status: 'renamed', from: source, to: target };
+
+    const secrets = readJson<Record<string, SecretMeta>>(SECRETS_FILE());
+    if (!Object.prototype.hasOwnProperty.call(secrets, source)) return { status: 'not_found' };
+    if (Object.prototype.hasOwnProperty.call(secrets, target)) return { status: 'conflict' };
+
+    const sourceBlob = join(BLOBS_DIR(), `${source}.enc`);
+    const targetBlob = join(BLOBS_DIR(), `${target}.enc`);
+    if (existsSync(targetBlob)) return { status: 'conflict' };
+    if (existsSync(sourceBlob)) copyFileSync(sourceBlob, targetBlob);
+
+    const meta = secrets[source];
+    delete secrets[source];
+    Object.defineProperty(secrets, target, {
+      value: { ...meta },
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+    writeJson(SECRETS_FILE(), secrets);
+
+    if (existsSync(sourceBlob)) unlinkSync(sourceBlob);
+    return { status: 'renamed', from: source, to: target };
   }
 
   /** Decrypt blob and return plaintext (used for one-time decrypt URLs) */
