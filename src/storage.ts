@@ -81,8 +81,14 @@ export function publicSecretMeta(meta: SecretMeta): PublicSecretMeta {
 }
 
 function readJson<T = Record<string, any>>(path: string): T {
-  if (!existsSync(path)) return {} as T;
-  return JSON.parse(readFileSync(path, 'utf8')) as T;
+  if (!existsSync(path)) return Object.create(null) as T;
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(`Expected a JSON object in ${path}`);
+  }
+  // These maps use user-controlled names as keys. A plain object would
+  // interpret keys such as "__proto__" through Object.prototype.
+  return Object.assign(Object.create(null), parsed) as T;
 }
 
 function writeJson(path: string, data: Record<string, any>): void {
