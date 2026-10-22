@@ -18,6 +18,7 @@
 
 import { generateX25519Identity, identityToRecipient, Decrypter, armor } from 'age-encryption';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, chmodSync } from 'node:fs';
+import { loadExistingAgentIdentity } from '../src/agent-identity.mjs';
 import { join } from 'node:path';
 import { hostname } from 'node:os';
 
@@ -53,8 +54,7 @@ function loadIdentity() {
     mkdirSync(IDENTITY_DIR, { recursive: true, mode: 0o700 });
     return null;
   }
-  chmodSync(IDENTITY_PATH, 0o600);
-  return JSON.parse(readFileSync(IDENTITY_PATH, 'utf8'));
+  return loadExistingAgentIdentity(IDENTITY_PATH);
 }
 
 async function ensureIdentity() {
