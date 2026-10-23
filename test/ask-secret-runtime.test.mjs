@@ -29,13 +29,17 @@ test('runtime maps a named profile to sss-run without accepting a caller command
   try {
     const operations = createRuntimeOperations();
     assert.deepEqual(await operations.probeSecret({ name: 'demo' }), { status: 'ready', name: 'demo' });
+    assert.deepEqual(await operations.listProfiles(), { profiles: ['canary'] });
     const probed = JSON.parse(await import('node:fs').then(({ readFileSync }) => readFileSync(probeReceipt, 'utf8')));
     assert.deepEqual(probed, { argv: ['demo'], requestOnly: '1' });
     assert.deepEqual(await operations.runProfile({ name: 'demo', profile: 'canary' }), { status: 'completed', name: 'demo', profile: 'canary' });
     const received = JSON.parse(await import('node:fs').then(({ readFileSync }) => readFileSync(receipt, 'utf8')));
     assert.deepEqual(received.argv, ['demo', '--', '/usr/bin/true', 'fixed']);
     assert.equal(received.requireAge, '1');
-    await assert.rejects(operations.runProfile({ name: 'demo', profile: 'missing' }), /unknown AskSecret profile/);
+    await assert.rejects(
+      operations.runProfile({ name: 'demo', profile: 'missing' }),
+      /unknown AskSecret profile: missing; call list_secret_run_profiles first/,
+    );
   } finally {
     for (const [key, value] of Object.entries(previous)) {
       if (value === undefined) delete process.env[key];

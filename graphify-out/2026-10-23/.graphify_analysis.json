@@ -1,0 +1,306 @@
+{
+  "communities": {
+    "0": [
+      "docs_agent_herder",
+      "docs_agent_resume",
+      "docs_ask_secret",
+      "docs_base64_fallback",
+      "docs_human_request_overview",
+      "docs_notify",
+      "docs_safety_invariant",
+      "readme_aes_gcm",
+      "readme_age_x25519",
+      "readme_agent_identity",
+      "readme_api_key_env",
+      "readme_architecture",
+      "readme_codex_integration",
+      "readme_delete_secret",
+      "readme_get_secret",
+      "readme_list_secrets",
+      "readme_nginx_config",
+      "readme_one_time_url",
+      "readme_register_agent",
+      "readme_sss_get_cli",
+      "readme_sss_overview",
+      "readme_sss_run_cli",
+      "readme_storage_layout",
+      "readme_systemd_unit",
+      "readme_threat_model",
+      "readme_web_input_form"
+    ],
+    "1": [
+      "src_config_sanitizename",
+      "src_config_secrets_file",
+      "src_storage_agents_file",
+      "src_storage_readjson",
+      "src_storage_storage",
+      "src_storage_storage_decryptsecret",
+      "src_storage_storage_deletesecret",
+      "src_storage_storage_encryptforagent",
+      "src_storage_storage_fillpending",
+      "src_storage_storage_getagent",
+      "src_storage_storage_getkey",
+      "src_storage_storage_getsecret",
+      "src_storage_storage_getsecretblob",
+      "src_storage_storage_getsecretmeta",
+      "src_storage_storage_listagents",
+      "src_storage_storage_listsecrets",
+      "src_storage_storage_registeragent",
+      "src_storage_storage_requestpending",
+      "src_storage_storage_resolveinputtoken",
+      "src_storage_storage_savesecret",
+      "src_storage_storage_updatemeta",
+      "src_storage_writejson"
+    ],
+    "2": [
+      "age_encryption",
+      "express",
+      "modelcontextprotocol_sdk",
+      "package",
+      "package_bin",
+      "package_bin_sss_install",
+      "package_dependencies",
+      "package_dependencies_age_encryption",
+      "package_dependencies_express",
+      "package_dependencies_modelcontextprotocol_sdk",
+      "package_dependencies_zod",
+      "package_name",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_start",
+      "package_scripts_test",
+      "package_type",
+      "package_version",
+      "zod"
+    ],
+    "3": [
+      "src_config",
+      "src_config_blobs_dir",
+      "src_config_ensuredirs",
+      "src_config_key_file",
+      "src_config_readkey",
+      "src_config_sss_dir",
+      "src_config_writekey",
+      "src_crypto",
+      "src_crypto_decrypt",
+      "src_crypto_decryptwithidentity",
+      "src_crypto_encrypt",
+      "src_crypto_encryptforrecipient",
+      "src_crypto_generateagentidentity",
+      "src_crypto_generatekey",
+      "src_crypto_validatekey",
+      "src_storage",
+      "src_storage_agentkey",
+      "src_storage_storage_constructor"
+    ],
+    "4": [
+      "ref_src",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_declaration",
+      "tsconfig_compileroptions_esmoduleinterop",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_outdir",
+      "tsconfig_compileroptions_rootdir",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_compileroptions_target",
+      "tsconfig_include"
+    ],
+    "5": [
+      "src_server",
+      "src_server_app",
+      "src_server_auth",
+      "src_server_cleanuptokens",
+      "src_server_dtokens",
+      "src_server_escapehtml",
+      "src_server_inputformhtml",
+      "src_server_makeserver",
+      "src_server_mcp",
+      "src_server_port",
+      "src_server_storage",
+      "src_server_transports",
+      "src_storage_secretmeta"
+    ],
+    "6": [
+      "bin_sss_run",
+      "bin_sss_run_consumerwrite",
+      "bin_sss_run_exitcode",
+      "bin_sss_run_getter",
+      "bin_sss_run_here",
+      "bin_sss_run_main",
+      "bin_sss_run_parseargs",
+      "bin_sss_run_pipesecrettocommand",
+      "bin_sss_run_waitforfirstsecretbyte",
+      "test_sss_run_test",
+      "test_sss_run_test_write"
+    ],
+    "7": [
+      "bin_sss_get",
+      "bin_sss_get_calljson",
+      "bin_sss_get_ensureidentity",
+      "bin_sss_get_ensureregistered",
+      "bin_sss_get_identity_dir",
+      "bin_sss_get_identity_path",
+      "bin_sss_get_loadidentity",
+      "bin_sss_get_mcp",
+      "bin_sss_get_parsesse"
+    ],
+    "8": [
+      "package_devdependencies",
+      "package_devdependencies_tsx",
+      "package_devdependencies_types_express",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "tsx",
+      "types_express",
+      "types_node",
+      "typescript"
+    ],
+    "9": [
+      "install",
+      "install_die",
+      "install_say",
+      "install_sh__entry",
+      "install_warn"
+    ],
+    "10": [
+      "bin_sss_install",
+      "bin_sss_install_here",
+      "bin_sss_install_install_sh",
+      "bin_sss_install_result"
+    ],
+    "11": [
+      "docs_sss_non_goals"
+    ]
+  },
+  "cohesion": {
+    "0": 0.12923076923076923,
+    "1": 0.26406926406926406,
+    "2": 0.1,
+    "3": 0.24183006535947713,
+    "4": 0.15384615384615385,
+    "5": 0.16666666666666666,
+    "6": 0.3090909090909091,
+    "7": 0.3055555555555556,
+    "8": 0.2222222222222222,
+    "9": 0.7,
+    "10": 0.5,
+    "11": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_storage_storage",
+      "label": "Storage",
+      "degree": 19
+    },
+    {
+      "id": "src_storage_readjson",
+      "label": "readJson()",
+      "degree": 13
+    },
+    {
+      "id": "src_config_secrets_file",
+      "label": "SECRETS_FILE()",
+      "degree": 12
+    },
+    {
+      "id": "src_config_blobs_dir",
+      "label": "BLOBS_DIR()",
+      "degree": 11
+    },
+    {
+      "id": "tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 10
+    },
+    {
+      "id": "src_config_sanitizename",
+      "label": "sanitizeName()",
+      "degree": 9
+    },
+    {
+      "id": "readme_sss_overview",
+      "label": "SSS \u2014 Simple Secret Storage (MCP)",
+      "degree": 9
+    },
+    {
+      "id": "src_config_ensuredirs",
+      "label": "ensureDirs()",
+      "degree": 8
+    },
+    {
+      "id": "readme_age_x25519",
+      "label": "age (X25519) end-to-end encryption",
+      "degree": 8
+    },
+    {
+      "id": "src_config_sss_dir",
+      "label": "SSS_DIR()",
+      "degree": 7
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Human Request in the secret stack",
+      "target": "SSS \u2014 Simple Secret Storage (MCP)",
+      "source_files": [
+        "docs/human-request.md",
+        "README.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `Human Request in the secret stack` unexpectedly reaches hub `SSS \u2014 Simple Secret Storage (MCP)`"
+    },
+    {
+      "source": "Base64 fallback when agent_id is absent (not E2E)",
+      "target": "MCP tool: get_secret",
+      "source_files": [
+        "docs/human-request.md",
+        "README.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `Base64 fallback when agent_id is absent (not E2E)` unexpectedly reaches hub `MCP tool: get_secret`"
+    },
+    {
+      "source": "Safety invariant: plaintext never in LLM context",
+      "target": "CLI: sss-run (pipe to child stdin)",
+      "source_files": [
+        "docs/human-request.md",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "Safety invariant: plaintext never in LLM context",
+      "target": "age (X25519) end-to-end encryption",
+      "source_files": [
+        "docs/human-request.md",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "makeServer()",
+      "target": "BLOBS_DIR()",
+      "source_files": [
+        "src/server.ts",
+        "src/config.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `makeServer()` unexpectedly reaches hub `BLOBS_DIR()`"
+    }
+  ],
+  "tokens": {
+    "input": 5018,
+    "output": 4055
+  }
+}

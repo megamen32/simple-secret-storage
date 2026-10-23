@@ -8,12 +8,12 @@ import { createRuntimeOperations, registerAskSecretTools } from '../dist/ask-sec
 
 // HTTP and stdio share one schema: the form tool never retrieves secret bytes.
 export { createRuntimeOperations };
-export function createAskSecretServer({ probeSecret, runProfile }) {
-  if (typeof probeSecret !== 'function' || typeof runProfile !== 'function') {
-    throw new TypeError('AskSecret requires probeSecret and runProfile operations');
+export function createAskSecretServer({ probeSecret, listProfiles, runProfile }) {
+  if (typeof probeSecret !== 'function' || typeof listProfiles !== 'function' || typeof runProfile !== 'function') {
+    throw new TypeError('AskSecret requires probeSecret, listProfiles and runProfile operations');
   }
   const server = new McpServer({ name: 'simple-secret-storage', version: '1.0.0' });
-  registerAskSecretTools(server, {probeSecret, runProfile});
+  registerAskSecretTools(server, {probeSecret, listProfiles, runProfile});
   return server;
 }
 let invokedDirectly = false;

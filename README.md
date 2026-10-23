@@ -16,6 +16,13 @@ and never retrieves a secret or a download URL. After the user submits, use
 only the separately authorized stdin consumer. `get_secret` also accepts an
 omitted name for older clients.
 
+**Always show a pending form link in a normal assistant message.** Many
+harnesses hide MCP tool results from the user. Do not assume that returning
+`input_url` from the MCP call displayed it. Reply with the exact returned URL
+as a clickable Markdown link, for example: `Введите секрет в
+[защищённой форме](URL)`, replacing `URL` with the exact returned
+`input_url`. Never invent or alter the URL.
+
 HTTP MCP uses the official SDK's stateless JSON transport. Pending forms and
 encrypted secrets stay in storage across restarts; stale MCP session headers
 do not block the next call. The stdio entrypoint uses the same tool definitions.
@@ -140,9 +147,10 @@ bearer_token_env_var = "SSS_API_KEY"
 `SSS_API_KEY` is loaded by `~/.profile` from `~/.config/sss-mcp/api-key.env`.
 
 Restart Codex (`codex` in a new login shell). The remote SSS endpoint exposes
-seven tools: `ask_secret`, `ask_secret_run`, `get_secret`, `list_secrets`,
-`register_agent`, `delete_secret`, and `rename_secret`. The narrow stdio
-entrypoint exposes only `ask_secret` and `ask_secret_run`.
+`ask_secret`, `list_secret_run_profiles`, `ask_secret_run`, `get_secret`,
+`list_secrets`, `register_agent`, `delete_secret`, and `rename_secret`. The
+narrow stdio entrypoint exposes `ask_secret`, `list_secret_run_profiles`, and
+`ask_secret_run`.
 
 For tool calls, pass `agent_id` to `get_secret` to get true E2E.
 
@@ -184,12 +192,20 @@ same SSS backend.
 | Tool             | Parameters                                                | What it returns                                                                                                                  |
 | ---------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `ask_secret` | `name?`, `request_id?` | `pending` with a one-time browser input URL, or `ready`; never a secret value or download URL. |
-| `ask_secret_run` | `name`, `profile` | Runs a configured consumer with the secret on stdin; no value in the result, arguments or environment. |
+| `list_secret_run_profiles` | — | Configured consumer profile names only; never executable paths or arguments. |
+| `ask_secret_run` | `name`, `profile` | Runs an exact configured profile with the secret on stdin; no value in the result, arguments or environment. |
 | `register_agent` | `agent_id`, `public_key` (age1...), `label?`              | Confirmation. Persists the public key in `~/.sss/agents.json`.                                                                   |
 | `get_secret`     | `name`, `agent_id?`                                       | If pending → returns `/i/<token>` URL for the user to submit the value. If ready → returns `/d/<token>` URL (age if `agent_id`, else base64) with pipe-usage hint. |
 | `list_secrets`   | —                                                         | Names + metadata (no values).                                                                                                    |
 | `delete_secret`  | `name`                                                    | Confirmation.                                                                                                                    |
 | `rename_secret` | `name`, `new_name` | Renames the stored entry without reading or returning its value. |
+
+Call `list_secret_run_profiles` before `ask_secret_run`. A profile is a
+preconfigured server-side consumer; do not guess a name or pass arbitrary
+commands through MCP. If no suitable profile exists and the authorized task
+needs a local consumer, use `sss-run <name> -- <fixed-consumer>` on the trusted
+host. The secret reaches only that consumer's stdin. Never use shell expansion,
+command substitution, environment variables, or arguments to move the value.
 
 ## Manage long-lived secrets
 

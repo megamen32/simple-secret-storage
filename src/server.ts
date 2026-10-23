@@ -151,7 +151,7 @@ function makeServer(): McpServer {
   });
   s.tool(
     'get_secret',
-    'Request a secret; name is optional and generated automatically. For a browser form prefer ask_secret, which never returns download URLs. If found, returns a one-time /d/ URL: age-encrypted for a registered agent, otherwise base64. The URL is a short-lived credential; never print or expose it. The value itself is not returned. If not found, tells the agent to ask the user to create it via the web UI.',
+    'Request a secret; name is optional and generated automatically. For a browser form prefer ask_secret. If this tool returns an /i/ input URL because the value is missing, repeat that exact URL in a normal user-facing assistant message as a clickable Markdown link; many harnesses hide MCP output. If found, returns a one-time /d/ URL: age-encrypted for a registered agent, otherwise base64. The /d/ URL is a short-lived credential; never print, expose or send it to the user. The value itself is not returned.',
     { name: z.string().optional().describe('Optional secret name; generated automatically if omitted'),
       agent_id: z.string().optional().describe('Agent ID registered via register_agent. If provided, the value is encrypted with the agent\'s age public key (true E2E); otherwise it is returned as base64 (SSS sees the plaintext).'),
       request_id: z.string().uuid().optional().describe('Opaque Human Request owner ID used only for completion correlation.') },
@@ -159,7 +159,7 @@ function makeServer(): McpServer {
       const name = secretRequestName(suppliedName, request_id);
       const meta = storage.getSecretMeta(name);
       // Pending = user hasn't entered the value yet. Surface the
-      // user-input URL so the agent forwards it again.
+      // user-input URL and tell the agent to echo it in a user-visible reply.
       if (!meta || meta.pending) {
         const { token, fresh, requestId } = storage.requestPending(name, request_id);
         return {
@@ -170,7 +170,8 @@ function makeServer(): McpServer {
                 ? `Secret "${name}" is pending user input.\n`
                 : `Secret "${name}" not found.\n`) +
               `${fresh ? 'Send the user this one-time URL' : 'Re-send the same one-time URL'} to enter the value:\n` +
-              `  ${SERVER_URL}/i/${token}\n\n` +
+              `  ${SERVER_URL}/i/${token}\n` +
+              `MCP results are hidden in many harnesses: repeat this exact URL in a separate normal assistant message as a clickable Markdown link.\n\n` +
               `Opaque request_id: ${requestId ?? '(not available for this legacy pending request)'}\n` +
               `After the user submits, call get_secret("${name}") again to receive the encrypted blob URL.`,
           }],

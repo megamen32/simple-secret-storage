@@ -1,0 +1,16 @@
+{
+  "0": "SSS — Simple Secret Storage (MCP)",
+  "1": "storage.ts",
+  "2": "package.json",
+  "3": "ask-secret-tools.ts",
+  "4": "compilerOptions",
+  "5": "server.ts",
+  "6": "ref_node_fs",
+  "7": "sss-get-identity.test.mjs",
+  "8": "20261017-test-secret-form.py",
+  "9": "install.sh",
+  "10": "Simple Secret Storage real-user canary access",
+  "11": "SSS non-goals (not a task runner, router, etc.)",
+  "12": "completion-callback.test.mjs",
+  "13": "Форма секрета с первого вызова"
+}

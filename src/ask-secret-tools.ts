@@ -13,6 +13,7 @@ const DEFAULT_SSS_GET = resolve(HERE, '../bin/sss-get.mjs');
 
 export type AskSecretOperations = {
   probeSecret(input: { name: string; request_id?: string }): unknown | Promise<unknown>;
+  listProfiles(): unknown | Promise<unknown>;
   runProfile(input: { name: string; profile: string }): unknown | Promise<unknown>;
 };
 
@@ -34,7 +35,7 @@ function textResult(result: unknown) {
 export function registerAskSecretTools(server: McpServer, operations: AskSecretOperations): void {
   server.tool(
     'ask_secret',
-    'Open a one-time browser form for entering a secret, or return ready when already supplied. Omit name to generate one automatically; never ask the user for a name. Returns only status and an input URL, never the secret or a download URL.',
+    'Open a one-time browser form for entering a secret, or return ready when already supplied. Omit name to generate one automatically; never ask the user for a name. Returns only status and an /i/ input URL, never the secret or a /d/ download URL. When status is pending, repeat the exact input_url in your next normal user-facing assistant message as a clickable Markdown link: many harnesses hide MCP tool output from the user.',
     {
       name: z.string().optional().describe('Optional label; generated automatically when omitted'),
       request_id: z.string().uuid().optional().describe('Reuse this optional request identity when retrying an unnamed form'),
@@ -42,11 +43,17 @@ export function registerAskSecretTools(server: McpServer, operations: AskSecretO
     async ({ name, request_id }) => textResult(await operations.probeSecret({ name: secretRequestName(name, request_id), ...(request_id ? {request_id} : {}) })),
   );
   server.tool(
+    'list_secret_run_profiles',
+    'List the names of configured server-side consumers available to ask_secret_run. Exposes profile names only, never commands or arguments. Call before ask_secret_run. If no suitable profile exists, use the trusted host sss-run CLI with a fixed, authorized consumer; do not invent profile names or pass arbitrary commands through MCP.',
+    {},
+    async () => textResult(await operations.listProfiles()),
+  );
+  server.tool(
     'ask_secret_run',
-    'Run a preconfigured profile with the named secret on stdin. The secret is never returned to the AI, arguments, or environment.',
+    'Run a preconfigured profile with the named secret on stdin. First call list_secret_run_profiles and use an exact returned name. The secret is never returned to the AI, arguments, or environment. If no suitable profile is listed, use sss-run on a trusted host; do not guess a profile or send arbitrary command code through MCP.',
     {
       name: z.string().min(1).describe('Provisioned secret name'),
-      profile: z.string().min(1).describe('Audited server-side stdin profile name'),
+      profile: z.string().min(1).describe('Exact configured profile name returned by list_secret_run_profiles'),
     },
     async ({ name, profile }) => textResult(await operations.runProfile({ name, profile })),
   );
@@ -116,7 +123,10 @@ export function createRuntimeOperations(): AskSecretOperations {
     async runProfile({ name, profile }) {
       const selected = configuredProfiles()[profile];
       if (!selected || typeof selected.executable !== 'string') {
-        throw new Error(`unknown AskSecret profile: ${profile}`);
+        throw new Error(
+          `unknown AskSecret profile: ${profile}; call list_secret_run_profiles first. ` +
+          'If no listed profile fits, use sss-run on a trusted host with the fixed authorized consumer.',
+        );
       }
       const args = selected.args ?? [];
       if (!Array.isArray(args) || args.some(arg => typeof arg !== 'string')) {
@@ -127,6 +137,10 @@ export function createRuntimeOperations(): AskSecretOperations {
         { SSS_REQUIRE_AGE: '1' },
       );
       return { status: 'completed', name, profile };
+    },
+    async listProfiles() {
+      const profiles = configuredProfiles();
+      return { profiles: Object.keys(profiles).sort() };
     },
   };
 }
