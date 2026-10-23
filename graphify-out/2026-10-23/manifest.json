@@ -1,67 +1,224 @@
 {
   "bin/sss-get.mjs": {
-    "mtime": 1785626447.9678562,
-    "ast_hash": "d4499ca6860d5e1c75412624125ea475",
-    "semantic_hash": "d4499ca6860d5e1c75412624125ea475"
+    "mtime": 1792707164.9341016,
+    "seen": 1792714099.7418516,
+    "ast_hash": "5f7798eb2e80e3f45a44f95c7e394031",
+    "semantic_hash": ""
   },
   "bin/sss-install.mjs": {
     "mtime": 1785635788.9294946,
+    "seen": 1792714099.7418551,
     "ast_hash": "3b67fce75b589f0d7530e11fffe35bd3",
     "semantic_hash": "3b67fce75b589f0d7530e11fffe35bd3"
   },
   "bin/sss-run.mjs": {
     "mtime": 1785619849.5948129,
+    "seen": 1792714099.74186,
     "ast_hash": "928b707a4d931c394489474981fe90b1",
     "semantic_hash": "928b707a4d931c394489474981fe90b1"
   },
   "install.sh": {
     "mtime": 1785637892.7818718,
+    "seen": 1792714099.7418633,
     "ast_hash": "c0782d4529080210f52a7248c3d7b4a6",
     "semantic_hash": "c0782d4529080210f52a7248c3d7b4a6"
   },
   "package.json": {
-    "mtime": 1785635890.079458,
-    "ast_hash": "3dd14f05c6499f1dac512e97d43825b5",
-    "semantic_hash": "3dd14f05c6499f1dac512e97d43825b5"
+    "mtime": 1786529001.9993513,
+    "seen": 1792714099.7418664,
+    "ast_hash": "81ae4845c25f97459495e1ff7947ea9f",
+    "semantic_hash": ""
   },
   "src/config.ts": {
-    "mtime": 1785607194.0,
-    "ast_hash": "0534f8a0648ac9c07e734cae9c203ec4",
-    "semantic_hash": "0534f8a0648ac9c07e734cae9c203ec4"
+    "mtime": 1792487492.776224,
+    "seen": 1792714099.741886,
+    "ast_hash": "50f85b83db49484f79061a7410495205",
+    "semantic_hash": ""
   },
   "src/crypto.ts": {
     "mtime": 1785618659.0415182,
+    "seen": 1792714099.741889,
     "ast_hash": "c47d13867681f8307580aa54e3f387fb",
     "semantic_hash": "c47d13867681f8307580aa54e3f387fb"
   },
   "src/server.ts": {
-    "mtime": 1785618557.7252705,
-    "ast_hash": "3d715c120cf071bc2d7e7ef5b2094af7",
-    "semantic_hash": "3d715c120cf071bc2d7e7ef5b2094af7"
+    "mtime": 1792714005.8203158,
+    "seen": 1792714099.7418919,
+    "ast_hash": "62846d7f301481f9862c956aa466d04b",
+    "semantic_hash": ""
   },
   "src/storage.ts": {
-    "mtime": 1785618168.2626257,
-    "ast_hash": "fecc6be9fdf64199801eb3d35cbb78b5",
-    "semantic_hash": "fecc6be9fdf64199801eb3d35cbb78b5"
+    "mtime": 1792528287.5230863,
+    "seen": 1792714099.7418947,
+    "ast_hash": "f274bd307c198540a08ddf0854a2ebb8",
+    "semantic_hash": ""
   },
   "test/sss-run.test.mjs": {
     "mtime": 1785619849.5958128,
+    "seen": 1792714099.7419229,
     "ast_hash": "64eb3343044d97666c0bc3c7e38c6b16",
     "semantic_hash": "64eb3343044d97666c0bc3c7e38c6b16"
   },
   "tsconfig.json": {
     "mtime": 1785606621.0,
+    "seen": 1792714099.7419262,
     "ast_hash": "2981a1fda8362bcd54f06d2ac4bc2feb",
     "semantic_hash": "2981a1fda8362bcd54f06d2ac4bc2feb"
   },
   "README.md": {
-    "mtime": 1785640483.359972,
-    "ast_hash": "94dedb2286ff6af8662b9c8d0a7d46f2",
-    "semantic_hash": "94dedb2286ff6af8662b9c8d0a7d46f2"
+    "mtime": 1792714076.0492554,
+    "seen": 1792714099.741934,
+    "ast_hash": "93ab94385f500d3a3a38c7fbafdbcb74",
+    "semantic_hash": ""
   },
   "docs/human-request.md": {
-    "mtime": 1785789437.233746,
-    "ast_hash": "15636fa2465a480084d67b47f286cb2e",
-    "semantic_hash": "15636fa2465a480084d67b47f286cb2e"
+    "mtime": 1785792758.5123675,
+    "seen": 1792714099.7419372,
+    "ast_hash": "dac2310bf092d2559e72a219e1344ac8",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/03ba73870267cb35598c37756770153a480ee43b698ea257960e2fe13f9ff6f1.json": {
+    "mtime": 1792535361.996868,
+    "seen": 1792714099.7418149,
+    "ast_hash": "e0f39e6781a40c64a5e31ad02340e5bb",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/05685e2c23a46d588622d4871c3ec3d0271a077bb7403945ad64b992493d0f68.json": {
+    "mtime": 1792488581.109408,
+    "seen": 1792714099.741822,
+    "ast_hash": "b808d86c42285d0dc2ccf393a620c25e",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/3397d5d5ac0b5a9889fc2ed0605c7121bb29f385852250977e69231f0aa741db.json": {
+    "mtime": 1792507021.7561567,
+    "seen": 1792714099.7418258,
+    "ast_hash": "0fdb7ae75a84abd87381d7d08256692e",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/4fa7732283f6672a19f4b577bbd99d38739480e403f9dcf58f47d3119f57a3aa.json": {
+    "mtime": 1792507673.4813218,
+    "seen": 1792714099.7418292,
+    "ast_hash": "507b6e536f67117b7dc68ab8ec5dc8ee",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/58318c4cf1f4a0c8763a5df2e7d8edad6e94177ed4b684229eb514dccf6c4ecb.json": {
+    "mtime": 1792488815.778463,
+    "seen": 1792714099.7418323,
+    "ast_hash": "224096b6d6f8d05a275e4ca6f9343c79",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/8c00170719d89d1ef8bbf3a5360880cdce7d49f6c50751e884c3d599276dbe9a.json": {
+    "mtime": 1792489014.4929488,
+    "seen": 1792714099.741835,
+    "ast_hash": "36c0206e9ce2d63ab4807e0f37491631",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/9d36bf3efbdbf7995457943001d4661c1748167cfc29989385f41b10a92c3748.json": {
+    "mtime": 1792488880.4142148,
+    "seen": 1792714099.7418385,
+    "ast_hash": "2f4e6513c718212f3afd2a81757f27e9",
+    "semantic_hash": ""
+  },
+  ".agents/shared-session/learning/a0cf2feb978f4b14371c3a1653d9ff07c0a323c3169f0b7adbc741c7a989543d.json": {
+    "mtime": 1792512068.3448126,
+    "seen": 1792714099.741841,
+    "ast_hash": "bac0e99dc1c1c5c7c546b2edd2a81d4f",
+    "semantic_hash": ""
+  },
+  ".agents/tasks/20261017-test-secret-form.py": {
+    "mtime": 1792191769.4981225,
+    "seen": 1792714099.741844,
+    "ast_hash": "03586dfdb2a248059b28a720b4198436",
+    "semantic_hash": ""
+  },
+  "bin/ask-secret-mcp.mjs": {
+    "mtime": 1792714005.8153157,
+    "seen": 1792714099.7418475,
+    "ast_hash": "b075f8b259218d5e6e2456eafbc5872c",
+    "semantic_hash": ""
+  },
+  "src/agent-identity.mjs": {
+    "mtime": 1792707164.9341016,
+    "seen": 1792714099.741869,
+    "ast_hash": "3c455d5b1fd1b4fedf497b8b9162d151",
+    "semantic_hash": ""
+  },
+  "src/ask-secret-tools.ts": {
+    "mtime": 1792714005.8133156,
+    "seen": 1792714099.7418718,
+    "ast_hash": "90cd364c023b33abba06ae04b8455804",
+    "semantic_hash": ""
+  },
+  "src/completion-callback.ts": {
+    "mtime": 1785792560.5769746,
+    "seen": 1792714099.7418747,
+    "ast_hash": "2f9a2115c639cbe4a90371a59667c85f",
+    "semantic_hash": ""
+  },
+  "test/ask-secret-http-registry.test.mjs": {
+    "mtime": 1792714017.7536442,
+    "seen": 1792714099.7418976,
+    "ast_hash": "752020099bdcdea86fe2339ed7f1b6ec",
+    "semantic_hash": ""
+  },
+  "test/ask-secret-runtime.test.mjs": {
+    "mtime": 1792714017.750644,
+    "seen": 1792714099.7419002,
+    "ast_hash": "0010065f5fabf87485c30ca21fe31aa8",
+    "semantic_hash": ""
+  },
+  "test/ask-secret-storage.test.mjs": {
+    "mtime": 1786513369.4132009,
+    "seen": 1792714099.7419026,
+    "ast_hash": "91f7d6dea094de8c99bf65b44ad36b1b",
+    "semantic_hash": ""
+  },
+  "test/ask-secret.test.mjs": {
+    "mtime": 1792714076.0482554,
+    "seen": 1792714099.7419052,
+    "ast_hash": "c59853e51bfb24bff761fbf1f0d46f9a",
+    "semantic_hash": ""
+  },
+  "test/completion-callback.test.mjs": {
+    "mtime": 1785792709.875028,
+    "seen": 1792714099.741908,
+    "ast_hash": "c5405873c455e013dcb9712033877d9d",
+    "semantic_hash": ""
+  },
+  "test/decrypt-token-revocation.test.mjs": {
+    "mtime": 1792528279.727838,
+    "seen": 1792714099.7419105,
+    "ast_hash": "ff4b6f5376aaf2d414f591d52e17ca61",
+    "semantic_hash": ""
+  },
+  "test/public-secret.test.mjs": {
+    "mtime": 1789345331.3632238,
+    "seen": 1792714099.7419133,
+    "ast_hash": "7f3b597b58ba3ca4182a6871695d1a54",
+    "semantic_hash": ""
+  },
+  "test/secret-form.test.mjs": {
+    "mtime": 1792191829.1327224,
+    "seen": 1792714099.7419167,
+    "ast_hash": "13b973cf79f7ef5eb99de3b2b39e25d3",
+    "semantic_hash": ""
+  },
+  "test/sss-get-identity.test.mjs": {
+    "mtime": 1792707164.9341016,
+    "seen": 1792714099.7419195,
+    "ast_hash": "b2f8328e62589f61ab5a1ca412621142",
+    "semantic_hash": ""
+  },
+  ".agents/TEST_ACCESS.md": {
+    "mtime": 1792526894.387726,
+    "seen": 1792714099.7419288,
+    "ast_hash": "fcb711cc774e6e5c494facc746c91c14",
+    "semantic_hash": ""
+  },
+  ".agents/tasks/20261017-first-call-secret-form.md": {
+    "mtime": 1792192024.4870558,
+    "seen": 1792714099.7419312,
+    "ast_hash": "5ed467ade9e30485a4afd0eecfb81075",
+    "semantic_hash": ""
   }
 }

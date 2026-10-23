@@ -1,7 +1,7 @@
 # Graph Report - simple-secret-storage  (2026-10-23)
 
 ## Corpus Check
-- 37 files · ~30,958 words
+- 37 files · ~31,131 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: .lock 8, .service 2, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b0ebff66`
+- Built from commit: `3706c408`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,13 +42,13 @@
 10. `makeServer()` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Human Request in the secret stack` --references--> `SSS — Simple Secret Storage (MCP)`  [EXTRACTED]
-  docs/human-request.md → README.md
 - `Base64 fallback when agent_id is absent (not E2E)` --references--> `MCP tool: get_secret`  [EXTRACTED]
+  docs/human-request.md → README.md
+- `Safety invariant: plaintext never in LLM context` --references--> `age (X25519) end-to-end encryption`  [INFERRED]
   docs/human-request.md → README.md
 - `Safety invariant: plaintext never in LLM context` --references--> `CLI: sss-run (pipe to child stdin)`  [INFERRED]
   docs/human-request.md → README.md
-- `Safety invariant: plaintext never in LLM context` --references--> `age (X25519) end-to-end encryption`  [INFERRED]
+- `Human Request in the secret stack` --references--> `SSS — Simple Secret Storage (MCP)`  [EXTRACTED]
   docs/human-request.md → README.md
 - `loadIdentity()` --calls--> `loadExistingAgentIdentity()`  [EXTRACTED]
   bin/sss-get.mjs → src/agent-identity.mjs
@@ -57,9 +57,9 @@
 - None detected.
 
 ## Hyperedges (group relationships)
-- **End-to-end encrypted secret delivery path** — readme_get_secret, readme_register_agent, readme_age_x25519, readme_one_time_url, readme_agent_identity, readme_sss_get_cli, readme_sss_run_cli [EXTRACTED 0.95]
 - **Ask Secret boundary over SSS** — docs_ask_secret, readme_web_input_form, readme_get_secret, readme_sss_overview, docs_safety_invariant [EXTRACTED 0.90]
 - **Proposed Ask Secret orchestration services** — docs_ask_secret, docs_notify, docs_agent_resume, docs_agent_herder [EXTRACTED 0.90]
+- **End-to-end encrypted secret delivery path** — readme_get_secret, readme_register_agent, readme_age_x25519, readme_one_time_url, readme_agent_identity, readme_sss_get_cli, readme_sss_run_cli [EXTRACTED 0.95]
 
 ## Communities (14 total, 4 thin omitted)
 

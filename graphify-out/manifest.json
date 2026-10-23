@@ -42,9 +42,9 @@
     "semantic_hash": "c47d13867681f8307580aa54e3f387fb"
   },
   "src/server.ts": {
-    "mtime": 1792714005.8203158,
-    "seen": 1792714099.7418919,
-    "ast_hash": "62846d7f301481f9862c956aa466d04b",
+    "mtime": 1792714208.6289585,
+    "seen": 1792714831.1059492,
+    "ast_hash": "59338718957baffea5e9c7b37173683e",
     "semantic_hash": ""
   },
   "src/storage.ts": {
@@ -66,9 +66,9 @@
     "semantic_hash": "2981a1fda8362bcd54f06d2ac4bc2feb"
   },
   "README.md": {
-    "mtime": 1792714076.0492554,
-    "seen": 1792714099.741934,
-    "ast_hash": "93ab94385f500d3a3a38c7fbafdbcb74",
+    "mtime": 1792714785.9624813,
+    "seen": 1792714831.1059773,
+    "ast_hash": "9287f49c30b21d8af56828feb9faddec",
     "semantic_hash": ""
   },
   "docs/human-request.md": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "src/ask-secret-tools.ts": {
-    "mtime": 1792714005.8133156,
-    "seen": 1792714099.7418718,
-    "ast_hash": "90cd364c023b33abba06ae04b8455804",
+    "mtime": 1792714752.3985095,
+    "seen": 1792714831.1059425,
+    "ast_hash": "242fbecb779dd06e149837d3e3c8311c",
     "semantic_hash": ""
   },
   "src/completion-callback.ts": {

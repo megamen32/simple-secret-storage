@@ -44,13 +44,13 @@ export function registerAskSecretTools(server: McpServer, operations: AskSecretO
   );
   server.tool(
     'list_secret_run_profiles',
-    'List the names of configured server-side consumers available to ask_secret_run. Exposes profile names only, never commands or arguments. Call before ask_secret_run. If no suitable profile exists, use the trusted host sss-run CLI with a fixed, authorized consumer; do not invent profile names or pass arbitrary commands through MCP.',
+    'List the names of configured server-side consumers available to ask_secret_run. Exposes profile names only, never commands or arguments. Call before ask_secret_run. If no suitable profile exists, use the installed sss-run CLI from the current task shell with a fixed, authorized consumer; do not ask the user to identify a host, invent profile names, or pass arbitrary commands through MCP. For a remote destination, make ssh the stdin consumer.',
     {},
     async () => textResult(await operations.listProfiles()),
   );
   server.tool(
     'ask_secret_run',
-    'Run a preconfigured profile with the named secret on stdin. First call list_secret_run_profiles and use an exact returned name. The secret is never returned to the AI, arguments, or environment. If no suitable profile is listed, use sss-run on a trusted host; do not guess a profile or send arbitrary command code through MCP.',
+    'Run a preconfigured profile with the named secret on stdin. First call list_secret_run_profiles and use an exact returned name. The secret is never returned to the AI, arguments, or environment. If no suitable profile is listed, continue with the installed sss-run CLI in the current task shell; check hostname -f and command -v sss-run yourself. For a remote destination, use ssh as the stdin consumer. Do not ask the user to classify a host, guess a profile, or send arbitrary command code through MCP.',
     {
       name: z.string().min(1).describe('Provisioned secret name'),
       profile: z.string().min(1).describe('Exact configured profile name returned by list_secret_run_profiles'),
@@ -125,7 +125,7 @@ export function createRuntimeOperations(): AskSecretOperations {
       if (!selected || typeof selected.executable !== 'string') {
         throw new Error(
           `unknown AskSecret profile: ${profile}; call list_secret_run_profiles first. ` +
-          'If no listed profile fits, use sss-run on a trusted host with the fixed authorized consumer.',
+          'If no listed profile fits, use the installed sss-run CLI in the current task shell with the fixed authorized consumer; check hostname -f and command -v sss-run. For a remote destination, use ssh as the stdin consumer.',
         );
       }
       const args = selected.args ?? [];

@@ -827,7 +827,7 @@
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "src/server.ts",
-      "source_location": "L615"
+      "source_location": "L616"
     },
     {
       "id": "src_server_inputformhtml",
@@ -839,7 +839,7 @@
       "file_type": "code",
       "norm_label": "inputformhtml()",
       "source_file": "src/server.ts",
-      "source_location": "L583"
+      "source_location": "L584"
     },
     {
       "id": "src_server_issamessoorigin",
@@ -863,7 +863,7 @@
       "file_type": "code",
       "norm_label": "publicsecretformhtml()",
       "source_file": "src/server.ts",
-      "source_location": "L466"
+      "source_location": "L467"
     },
     {
       "id": "src_server_publicsecretsavedhtml",
@@ -875,7 +875,7 @@
       "file_type": "code",
       "norm_label": "publicsecretsavedhtml()",
       "source_file": "src/server.ts",
-      "source_location": "L500"
+      "source_location": "L501"
     },
     {
       "id": "src_server_sendsecrethtml",
@@ -887,7 +887,7 @@
       "file_type": "code",
       "norm_label": "sendsecrethtml()",
       "source_file": "src/server.ts",
-      "source_location": "L459"
+      "source_location": "L460"
     },
     {
       "id": "src_server_sessionfor",
@@ -923,7 +923,7 @@
       "file_type": "code",
       "norm_label": "webuihtml()",
       "source_file": "src/server.ts",
-      "source_location": "L844"
+      "source_location": "L845"
     },
     {
       "id": "bin_ask_secret_mcp_createasksecretserver",
@@ -2840,6 +2840,7 @@
     {
       "id": "ref_node_crypto",
       "label": "ref_node_crypto",
+      "_origin": "semantic",
       "community": 1,
       "community_name": "storage.ts",
       "external": true,
@@ -2851,6 +2852,7 @@
     {
       "id": "dist_completion_callback",
       "label": "dist_completion_callback",
+      "_origin": "semantic",
       "community": 12,
       "community_name": "completion-callback.test.mjs",
       "external": true,
@@ -2862,6 +2864,7 @@
     {
       "id": "dist_completion_callback_allowed_completion_callback",
       "label": "dist_completion_callback_allowed_completion_callback",
+      "_origin": "semantic",
       "community": 12,
       "community_name": "completion-callback.test.mjs",
       "external": true,
@@ -2873,6 +2876,7 @@
     {
       "id": "dist_completion_callback_buildcompletionevent",
       "label": "dist_completion_callback_buildcompletionevent",
+      "_origin": "semantic",
       "community": 12,
       "community_name": "completion-callback.test.mjs",
       "external": true,
@@ -2884,6 +2888,7 @@
     {
       "id": "dist_completion_callback_getcompletioncallback",
       "label": "dist_completion_callback_getcompletioncallback",
+      "_origin": "semantic",
       "community": 12,
       "community_name": "completion-callback.test.mjs",
       "external": true,
@@ -2895,6 +2900,7 @@
     {
       "id": "dist_completion_callback_postcompletion",
       "label": "dist_completion_callback_postcompletion",
+      "_origin": "semantic",
       "community": 12,
       "community_name": "completion-callback.test.mjs",
       "external": true,
@@ -2906,6 +2912,7 @@
     {
       "id": "bin_ask_secret_mcp_createruntimeoperations",
       "label": "bin_ask_secret_mcp_createruntimeoperations",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2917,6 +2924,7 @@
     {
       "id": "dist_ask_secret_tools",
       "label": "dist_ask_secret_tools",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2928,6 +2936,7 @@
     {
       "id": "dist_ask_secret_tools_createruntimeoperations",
       "label": "dist_ask_secret_tools_createruntimeoperations",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2939,6 +2948,7 @@
     {
       "id": "dist_ask_secret_tools_registerasksecrettools",
       "label": "dist_ask_secret_tools_registerasksecrettools",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2950,6 +2960,7 @@
     {
       "id": "ref_node_assert",
       "label": "ref_node_assert",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2961,6 +2972,7 @@
     {
       "id": "ref_node_child_process",
       "label": "ref_node_child_process",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2972,6 +2984,7 @@
     {
       "id": "ref_node_events",
       "label": "ref_node_events",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2983,6 +2996,7 @@
     {
       "id": "ref_node_fs",
       "label": "ref_node_fs",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -2994,6 +3008,7 @@
     {
       "id": "ref_node_net",
       "label": "ref_node_net",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3005,6 +3020,7 @@
     {
       "id": "ref_node_os",
       "label": "ref_node_os",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3016,6 +3032,7 @@
     {
       "id": "ref_node_path",
       "label": "ref_node_path",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3027,6 +3044,7 @@
     {
       "id": "ref_node_stream",
       "label": "ref_node_stream",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3038,6 +3056,7 @@
     {
       "id": "ref_node_test",
       "label": "ref_node_test",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3049,6 +3068,7 @@
     {
       "id": "ref_node_url",
       "label": "ref_node_url",
+      "_origin": "semantic",
       "community": 6,
       "community_name": "ref_node_fs",
       "external": true,
@@ -3060,6 +3080,7 @@
     {
       "id": "ref_node_http",
       "label": "ref_node_http",
+      "_origin": "semantic",
       "community": 7,
       "community_name": "sss-get-identity.test.mjs",
       "external": true,
@@ -3071,6 +3092,7 @@
     {
       "id": "ref_node_module",
       "label": "ref_node_module",
+      "_origin": "semantic",
       "community": 7,
       "community_name": "sss-get-identity.test.mjs",
       "external": true,
@@ -3082,6 +3104,7 @@
     {
       "id": "json",
       "label": "json",
+      "_origin": "semantic",
       "community": 8,
       "community_name": "20261017-test-secret-form.py",
       "external": true,
@@ -3093,6 +3116,7 @@
     {
       "id": "os",
       "label": "os",
+      "_origin": "semantic",
       "community": 8,
       "community_name": "20261017-test-secret-form.py",
       "external": true,
@@ -3104,6 +3128,7 @@
     {
       "id": "pathlib",
       "label": "pathlib",
+      "_origin": "semantic",
       "community": 8,
       "community_name": "20261017-test-secret-form.py",
       "external": true,
@@ -3115,6 +3140,7 @@
     {
       "id": "subprocess",
       "label": "subprocess",
+      "_origin": "semantic",
       "community": 8,
       "community_name": "20261017-test-secret-form.py",
       "external": true,
@@ -3126,6 +3152,7 @@
     {
       "id": "time",
       "label": "time",
+      "_origin": "semantic",
       "community": 8,
       "community_name": "20261017-test-secret-form.py",
       "external": true,
@@ -3457,7 +3484,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L589",
+      "source_location": "L590",
       "weight": 1.0
     },
     {
@@ -3505,7 +3532,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L181",
+      "source_location": "L182",
       "weight": 1.0
     },
     {
@@ -3517,7 +3544,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L186",
+      "source_location": "L187",
       "weight": 1.0
     },
     {
@@ -3529,7 +3556,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L260",
+      "source_location": "L261",
       "weight": 1.0
     },
     {
@@ -3541,7 +3568,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L277",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -3553,7 +3580,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L490",
+      "source_location": "L491",
       "weight": 1.0
     },
     {
@@ -3565,7 +3592,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L519",
+      "source_location": "L520",
       "weight": 1.0
     },
     {
@@ -3625,7 +3652,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L848",
+      "source_location": "L849",
       "weight": 1.0
     },
     {
@@ -3637,7 +3664,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L849",
+      "source_location": "L850",
       "weight": 1.0
     },
     {
@@ -4501,7 +4528,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L459",
+      "source_location": "L460",
       "weight": 1.0
     },
     {
@@ -4513,7 +4540,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L466",
+      "source_location": "L467",
       "weight": 1.0
     },
     {
@@ -4537,7 +4564,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L500",
+      "source_location": "L501",
       "weight": 1.0
     },
     {
@@ -4549,7 +4576,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L583",
+      "source_location": "L584",
       "weight": 1.0
     },
     {
@@ -4561,7 +4588,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L615",
+      "source_location": "L616",
       "weight": 1.0
     },
     {
@@ -4573,7 +4600,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/server.ts",
-      "source_location": "L844",
+      "source_location": "L845",
       "weight": 1.0
     },
     {
@@ -8243,7 +8270,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "src/server.ts",
-      "source_location": "L325",
+      "source_location": "L326",
       "weight": 1.0
     },
     {
@@ -8781,5 +8808,5 @@
       "source_file": "README.md"
     }
   ],
-  "built_at_commit": "b0ebff66003c6de2611177b25045e382966687fa"
+  "built_at_commit": "3706c40805a7f09ecab0ca852ed8f9ba93d2d8c3"
 }

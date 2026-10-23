@@ -164,10 +164,12 @@ claude mcp add sss --transport http \
 
 ## How agents get the API key
 
-Provision an SSS API key only to a trusted host through a private, approved
-channel. Anyone holding an SSS Bearer key can list, read, save and delete every
-secret, so treat it as full vault access. Never put a live key in this README,
-chat, shell history, or a command-line argument.
+Provision an SSS API key only to a machine whose operator is authorized for
+full vault access, using a private, approved channel. The machine running
+`sss-get` or `sss-run` needs the key; SSS does not register or classify hosts.
+Anyone holding an SSS Bearer key can list, read,
+save and delete every secret, so treat it as full vault access. Never put a
+live key in this README, chat, shell history, or a command-line argument.
 
 Create the client-side file, then populate it from a trusted secret-delivery
 channel without putting the key in shell history or a command argument:
@@ -202,10 +204,15 @@ same SSS backend.
 
 Call `list_secret_run_profiles` before `ask_secret_run`. A profile is a
 preconfigured server-side consumer; do not guess a name or pass arbitrary
-commands through MCP. If no suitable profile exists and the authorized task
-needs a local consumer, use `sss-run <name> -- <fixed-consumer>` on the trusted
-host. The secret reaches only that consumer's stdin. Never use shell expansion,
+commands through MCP. If no suitable profile exists, continue in the shell
+where the current task runs: check `hostname -f` and `command -v sss-run`, then
+run `sss-run <name> -- <fixed-consumer>`. The user does not need to classify
+the machine. If the consumer must run on another server, use `ssh` itself as
+the stdin consumer: `sss-run <name> -- ssh server-alias <fixed-remote-command>`.
+The secret reaches the consumer only through stdin. Never use shell expansion,
 command substitution, environment variables, or arguments to move the value.
+The `/d/` retrieval grant is single-use and expires after five minutes; no
+temporary profile is needed for a one-off operation.
 
 ## Manage long-lived secrets
 
